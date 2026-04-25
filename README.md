@@ -32,7 +32,27 @@ including the Horadric Cube. Items are decomposed into:
 transmutation, and any "active in cube" passive effects without touching the
 item model itself.
 
-## Install / run (Windows 11)
+## Install / run
+
+Requires Python 3.11+.
+
+### Linux / macOS (current local dev environment)
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -e .
+lohbuild warlock --level 70
+lohbuild warlock --level 70 --season-journey 13   # full 83-point pool
+```
+
+Or without activating:
+
+```bash
+.venv/bin/lohbuild warlock --level 70
+```
+
+### Windows 11 (target deployment)
 
 ```powershell
 py -3.11 -m venv .venv
@@ -40,6 +60,12 @@ py -3.11 -m venv .venv
 pip install -e .
 lohbuild warlock --level 70
 ```
+
+### Iterating on data
+
+The package is installed in editable mode, so edits to `src/lohbuild/**`
+(including `data/classes/warlock.yaml`) are picked up on the next CLI
+invocation — no reinstall needed.
 
 ## Layout
 
