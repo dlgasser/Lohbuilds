@@ -1,0 +1,100 @@
+# PLACEHOLDER ITEMIZATION
+#
+# When the Lord of Hatred itemization details land (Horadric Cube, new affix
+# pools, masterworking changes), replace this file. The schema is intentionally
+# loose: base_items list one entry per slot, and cube_recipes can produce
+# either a crafted item, a passive effect, or both.
+
+base_items:
+  - id: leveling_helm
+    slot: helm
+    placeholder: true
+    socket_count: 1
+    intrinsic:
+      armor: 120
+      life: 60
+  - id: leveling_chest
+    slot: chest
+    placeholder: true
+    socket_count: 2
+    intrinsic:
+      armor: 220
+      life: 110
+      damage_reduction: 0.05
+  - id: leveling_gloves
+    slot: gloves
+    placeholder: true
+    intrinsic:
+      armor: 80
+      attack_speed: 1.05
+      crit_chance: 0.04
+  - id: leveling_pants
+    slot: pants
+    placeholder: true
+    socket_count: 2
+    intrinsic:
+      armor: 180
+      life: 90
+  - id: leveling_boots
+    slot: boots
+    placeholder: true
+    intrinsic:
+      armor: 90
+      life: 40
+  - id: leveling_amulet
+    slot: amulet
+    placeholder: true
+    socket_count: 1
+    intrinsic:
+      resist_all: 0.10
+      multiplicative_damage: 1.05
+  - id: leveling_ring
+    slot: ring_1
+    placeholder: true
+    socket_count: 1
+    intrinsic:
+      crit_chance: 0.03
+      crit_damage: 1.6
+      additive_damage: 0.05
+  - id: leveling_focus
+    slot: focus
+    placeholder: true
+    socket_count: 1
+    intrinsic:
+      additive_damage: 0.10
+      crit_chance: 0.04
+  - id: leveling_weapon
+    slot: weapon_main
+    placeholder: true
+    socket_count: 1
+    intrinsic:
+      weapon_damage: 80.0
+      multiplicative_damage: 1.10
+
+# Horadric Cube recipes. Inputs/output are free-form strings until the
+# expansion's recipe grammar is documented. `effect.stats` is applied while
+# the recipe is "active" — see CubeRecipe in src/lohbuild/model/gear.py for
+# the rules that govern that.
+cube_recipes:
+  - id: cube_minor_focus
+    name: Minor Focus of Hatred
+    placeholder: true
+    source_url: https://d4builds.gg/database/itemization/horadric-cube
+    inputs: [common_skull, magic_amulet]
+    output: rare_amulet_with_socket
+    effect:
+      stats:
+        crit_chance: 0.02
+        additive_damage: 0.04
+      notes: "Generic +crit / +damage placeholder; replace once recipes are public."
+
+  - id: cube_warding_imbue
+    name: Warding Imbue
+    placeholder: true
+    source_url: https://d4builds.gg/database/itemization/horadric-cube
+    inputs: [magic_chest, ward_essence]
+    effect:
+      stats:
+        damage_reduction: 0.06
+        resist_all: 0.05
+      notes: "Defensive placeholder; intended for the chest slot."

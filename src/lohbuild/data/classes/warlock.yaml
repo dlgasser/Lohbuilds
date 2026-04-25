@@ -1,0 +1,167 @@
+# PLACEHOLDER WARLOCK DATA
+#
+# Numbers below are shaped to exercise the optimizer, not to recommend a real
+# build. Replace each entry with values scraped from d4builds.gg once the
+# Lord of Hatred class data is published. The `source_url` field on each entry
+# is the page we plan to pull from.
+
+class_id: warlock
+name: Warlock
+
+# Per-level base stats granted automatically. Currently a placeholder curve.
+base_stats_per_level:
+  life: 14.0
+  armor: 2.0
+  weapon_damage: 1.0
+
+skills:
+  - id: hex_bolt
+    name: Hex Bolt
+    tag: basic
+    max_rank: 5
+    min_level: 1
+    placeholder: true
+    source_url: https://d4builds.gg/database/warlock/skills/hex-bolt
+    per_rank_increment: 0.10
+    cost:
+      resource: mana
+      amount: 0
+    base_effect:
+      base_damage_pct: 0.30
+      damage_type: shadow
+      cast_time: 0.4
+      targets: 1
+
+  - id: cinder_lash
+    name: Cinder Lash
+    tag: core
+    max_rank: 5
+    min_level: 2
+    placeholder: true
+    source_url: https://d4builds.gg/database/warlock/skills/cinder-lash
+    per_rank_increment: 0.10
+    cost:
+      resource: mana
+      amount: 25
+    base_effect:
+      base_damage_pct: 0.85
+      damage_type: fire
+      cast_time: 0.6
+      aoe: true
+      targets: 4
+      applies_vulnerable: true
+
+  - id: warding_sigil
+    name: Warding Sigil
+    tag: defensive
+    max_rank: 5
+    min_level: 6
+    placeholder: true
+    source_url: https://d4builds.gg/database/warlock/skills/warding-sigil
+    per_rank_increment: 0.05
+    base_effect:
+      base_damage_pct: 0.0
+      damage_type: shadow
+      cooldown: 12.0
+      cast_time: 0.3
+      self_buff:
+        damage_reduction: 0.20
+        armor: 200.0
+
+  - id: phantom_step
+    name: Phantom Step
+    tag: mobility
+    max_rank: 3
+    min_level: 8
+    placeholder: true
+    source_url: https://d4builds.gg/database/warlock/skills/phantom-step
+    per_rank_increment: 0.05
+    base_effect:
+      base_damage_pct: 0.20
+      damage_type: shadow
+      cooldown: 9.0
+      cast_time: 0.2
+      aoe: true
+      targets: 3
+
+  - id: bound_familiar
+    name: Bound Familiar
+    tag: conjuration
+    max_rank: 5
+    min_level: 15
+    placeholder: true
+    source_url: https://d4builds.gg/database/warlock/skills/bound-familiar
+    per_rank_increment: 0.10
+    base_effect:
+      base_damage_pct: 0.55
+      damage_type: lightning
+      cooldown: 0.0
+      cast_time: 0.5
+      targets: 2
+
+  - id: hatreds_grasp
+    name: Hatred's Grasp
+    tag: ultimate
+    max_rank: 5
+    min_level: 25
+    placeholder: true
+    source_url: https://d4builds.gg/database/warlock/skills/hatreds-grasp
+    per_rank_increment: 0.10
+    base_effect:
+      base_damage_pct: 3.50
+      damage_type: shadow
+      cooldown: 60.0
+      cast_time: 0.8
+      aoe: true
+      targets: 8
+      applies_vulnerable: true
+
+passives:
+  - id: dark_attunement
+    name: Dark Attunement
+    max_rank: 3
+    min_level: 5
+    placeholder: true
+    source_url: https://d4builds.gg/database/warlock/passives/dark-attunement
+    per_rank:
+      additive_damage: 0.06
+
+  - id: hexed_flesh
+    name: Hexed Flesh
+    max_rank: 3
+    min_level: 5
+    placeholder: true
+    source_url: https://d4builds.gg/database/warlock/passives/hexed-flesh
+    per_rank:
+      life: 80.0
+      damage_reduction: 0.03
+
+  - id: searing_will
+    name: Searing Will
+    max_rank: 3
+    min_level: 10
+    placeholder: true
+    source_url: https://d4builds.gg/database/warlock/passives/searing-will
+    per_rank:
+      multiplicative_damage: 1.04
+
+  - id: warden_of_bone
+    name: Warden of Bone
+    max_rank: 3
+    min_level: 15
+    placeholder: true
+    source_url: https://d4builds.gg/database/warlock/passives/warden-of-bone
+    per_rank:
+      armor: 60.0
+      resist_all: 0.04
+
+  - id: covenant_of_hatred
+    name: Covenant of Hatred
+    max_rank: 1
+    min_level: 30
+    placeholder: true
+    source_url: https://d4builds.gg/database/warlock/passives/covenant-of-hatred
+    requires: [dark_attunement, searing_will]
+    per_rank:
+      multiplicative_damage: 1.10
+      crit_damage: 1.65

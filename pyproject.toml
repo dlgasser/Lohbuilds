@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lohbuild"
+version = "0.0.1"
+description = "Diablo 4 Lord of Hatred build optimizer (Warlock leveling, 1-70)"
+requires-python = ">=3.11"
+dependencies = [
+    "PyYAML>=6.0",
+]
+
+[project.scripts]
+lohbuild = "lohbuild.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"lohbuild.data" = ["**/*.yaml"]
