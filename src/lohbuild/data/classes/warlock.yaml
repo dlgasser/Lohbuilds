@@ -205,56 +205,11 @@ skills:
         multiplicative_damage: 1.20
         attack_speed: 1.20
 
-# All passive names below are placeholders. The Warlock passive tree is
-# documented (Volatility / Brimstone / Hex / Vollach cluster) but per-node
-# names and per-rank effects were not extractable from search snippets alone.
-# Replace once a real source is reachable.
-passives:
-  - id: volatility_focus
-    name: Volatility Focus
-    max_rank: 3
-    min_level: 5
-    placeholder: true
-    source_url: https://maxroll.gg/d4/getting-started/warlock-class-overview
-    per_rank:
-      additive_damage: 0.06
-
-  - id: hexed_flesh
-    name: Hexed Flesh
-    max_rank: 3
-    min_level: 5
-    placeholder: true
-    source_url: https://maxroll.gg/d4/getting-started/warlock-class-overview
-    per_rank:
-      life: 80.0
-      damage_reduction: 0.03
-
-  - id: brimstone_will
-    name: Brimstone Will
-    max_rank: 3
-    min_level: 10
-    placeholder: true
-    source_url: https://maxroll.gg/d4/getting-started/warlock-class-overview
-    per_rank:
-      multiplicative_damage: 1.04
-
-  - id: warden_of_bone
-    name: Warden of Bone
-    max_rank: 3
-    min_level: 15
-    placeholder: true
-    source_url: https://maxroll.gg/d4/getting-started/warlock-class-overview
-    per_rank:
-      armor: 60.0
-      resist_all: 0.04
-
-  - id: covenant_of_hatred
-    name: Covenant of Hatred
-    max_rank: 1
-    min_level: 30
-    placeholder: true
-    source_url: https://maxroll.gg/d4/getting-started/warlock-class-overview
-    requires: [volatility_focus, brimstone_will]
-    per_rank:
-      multiplicative_damage: 1.10
-      crit_damage: 1.65
+# Lord of Hatred removes all passive nodes from class skill trees. Passive-
+# style power is now sourced from Legendary Aspects, Uniques, and the new
+# Talisman + Charms system — none of which are modeled here yet. We keep an
+# empty `passives:` list so the loader and optimizer continue to work; populate
+# it only if a future patch reintroduces tree passives.
+#
+# Source: https://news.blizzard.com/en-us/article/24267729/prepare-for-the-reckoning-lord-of-hatred-draws-near
+passives: []

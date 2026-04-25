@@ -16,15 +16,20 @@ from .model.enemy import EnemyProfile
 from .scoring import Score, score_build
 
 
-# How many skill points are typically available per character level.
-#
-# Pre-LoH this was 1 (≈58 points by level 50). Lord of Hatred raises every
-# skill's base cap from 5 to 15 ranks, and the user has confirmed the total
-# point pool is also higher. Until the real curve is published we use 2/level
-# (140 points by level 70) as a moderate guess. Override here when datamines
-# land.
-SKILL_POINTS_PER_LEVEL = 2
+# Lord of Hatred ships with 83 total skill points. The exact per-level
+# schedule is not public; we distribute linearly from level 2 to LEVEL_CAP_FOR_POINTS
+# until datamines land. Override `points_at_level` if you have a real curve.
+SKILL_POINTS_TOTAL = 83
+LEVEL_CAP_FOR_POINTS = 70
 MAX_BAR = 6
+
+
+def points_at_level(level: int) -> int:
+    if level <= 1:
+        return 0
+    if level >= LEVEL_CAP_FOR_POINTS:
+        return SKILL_POINTS_TOTAL
+    return round(SKILL_POINTS_TOTAL * (level - 1) / (LEVEL_CAP_FOR_POINTS - 1))
 
 
 @dataclass
@@ -110,16 +115,19 @@ def optimize_leveling(
     build = Build(class_id=cls.class_id, level=1)
     build.loadout = _starter_loadout(items)
     history: list[LevelStep] = []
+    spent = 0
 
     for level in range(1, level_cap + 1):
         build.level = level
         build.base_stats = _level_base_stats(cls, level)
-        for _ in range(SKILL_POINTS_PER_LEVEL):
+        target = min(points_at_level(level), SKILL_POINTS_TOTAL)
+        while spent < target:
             candidates = _candidate_skill_targets(build, cls)
             if not candidates:
                 break
             best = max(candidates, key=lambda c: _trial_score(build, cls, c).composite)
             _apply_point(build, cls, best)
+            spent += 1
             history.append(
                 LevelStep(
                     level=level,
@@ -146,9 +154,13 @@ def _level_base_stats(cls: ClassData, level: int):
 def report(result: OptimizerResult, cls: ClassData) -> str:
     final = result.final_build
     final_score = score_build(final, cls.skills, cls.passives)
+    points_spent = sum(final.allocation.skill_ranks.values()) + sum(
+        final.allocation.passive_ranks.values()
+    )
     lines = [
         f"Class: {cls.name} ({cls.class_id})",
         f"Level: {final.level}",
+        f"Skill points: {points_spent}/{SKILL_POINTS_TOTAL} (cap reached at level {LEVEL_CAP_FOR_POINTS})",
         "",
         "Skill bar:",
     ]
@@ -158,13 +170,16 @@ def report(result: OptimizerResult, cls: ClassData) -> str:
         if skill:
             tag = "[placeholder]" if skill.placeholder else ""
             lines.append(f"  - {skill.name} ({sid}) rank {rank}/{skill.max_rank} {tag}")
-    lines.append("")
-    lines.append("Passives:")
-    for pid, rank in final.allocation.passive_ranks.items():
-        passive = cls.passives.get(pid)
-        if passive:
-            tag = "[placeholder]" if passive.placeholder else ""
-            lines.append(f"  - {passive.name} ({pid}) rank {rank}/{passive.max_rank} {tag}")
+    if final.allocation.passive_ranks:
+        lines.append("")
+        lines.append("Passives (legacy — removed from class tree in LoH):")
+        for pid, rank in final.allocation.passive_ranks.items():
+            passive = cls.passives.get(pid)
+            if passive:
+                tag = "[placeholder]" if passive.placeholder else ""
+                lines.append(
+                    f"  - {passive.name} ({pid}) rank {rank}/{passive.max_rank} {tag}"
+                )
     lines.append("")
     lines.append("Cube residents:")
     if not final.loadout.cube_residents:

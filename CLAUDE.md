@@ -28,9 +28,11 @@ src/lohbuild/
 
 - **Composite score:** `0.6 * normalized_DPS + 0.4 * normalized_EHP`. Promote
   to a CLI flag once real data is in. Live in `scoring.py`.
-- **Skill points per level:** 2 (constant). Bumped from 1 because the user
-  confirmed Lord of Hatred raises the total skill-point pool. The exact curve
-  is not public yet; revisit when datamined.
+- **Total skill points: 83** (user-confirmed, source:
+  `news.blizzard.com/en-us/article/24267729/prepare-for-the-reckoning-lord-of-hatred-draws-near`).
+  The per-level schedule is not public; `optimizer.points_at_level()` linearly
+  interpolates from 0 at level 1 to 83 at level 70. Replace with the real
+  schedule when datamined.
 - **Skill bar cap:** 6.
 - **Allocator:** pure greedy per-level, no backtracking. Adequate for
   scaffolding; will likely need beam search or local-search polish once
@@ -75,12 +77,22 @@ Horadric Cube. See `src/lohbuild/model/gear.py`.
 - Skill categories shipped: Basic, Core, Defensive, Archfiend (summon), Sigil,
   Ultimate.
 - **User-confirmed rules (2026-04-25):**
-  - Every active skill has **max rank 15** (was 5). Secondary modifier /
-    variant nodes are *not* raised — they keep their pre-LoH caps. We do not
-    model variant nodes yet.
-  - Total available skill points is **higher** than pre-LoH; exact curve not
-    given. Currently using 2 points/level as a holding value (see
-    `optimizer.SKILL_POINTS_PER_LEVEL`).
+  - Every active skill has **max rank 15** (was 5). Modifier / variant nodes
+    are *not* raised — they keep their pre-LoH caps. We do not model variant
+    nodes yet.
+  - **Total available skill points: 83.** Per-level schedule unknown;
+    distributed linearly in `optimizer.points_at_level()` until datamined.
+- **Passive nodes are removed from every class skill tree in LoH.** Passive
+  power moved to Legendary Aspects, Uniques, and the new **Talisman + Charms**
+  system (charms socket into a Talisman to grant passive effects). None of
+  those three sources are modeled yet — the `Passive` model class still
+  exists and can be reused for Talisman/Charms when the schema lands.
+- **Per-skill modifier system (not yet modeled):** each active skill exposes
+  three branches with up to 12 modifier combinations — a Left-Path passive,
+  a Right-Path passive, and a Middle-Path transformative variant, plus a
+  Bonus Variant in branch 3 (1 of 3 build-defining properties). When we model
+  this, expect a `modifiers:` block under each skill in `warlock.yaml` and a
+  separate selection field on `SkillAllocation`.
 
 ## Skill names known (source: WebSearch snippets, not page-verified)
 
