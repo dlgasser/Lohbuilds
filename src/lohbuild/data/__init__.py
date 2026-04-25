@@ -12,6 +12,8 @@ from ..model import (
     CubeRecipe,
     DamageType,
     GearSlot,
+    Modifier,
+    ModifierSlot,
     Passive,
     ResourceCost,
     Skill,
@@ -58,12 +60,28 @@ def _skill_effect(d: dict[str, Any]) -> SkillEffect:
     )
 
 
+def _modifier(d: dict[str, Any], parent_skill: str) -> Modifier:
+    return Modifier(
+        id=d["id"],
+        name=d["name"],
+        slot=ModifierSlot(d["slot"]),
+        parent_skill=parent_skill,
+        stats=_statblock(d.get("stats")),
+        requires_rank=int(d.get("requires_rank", 1)),
+        placeholder=bool(d.get("placeholder", False)),
+        source_url=d.get("source_url"),
+        notes=d.get("notes", ""),
+    )
+
+
 def _skill(d: dict[str, Any]) -> Skill:
     cost = None
     if d.get("cost"):
         cost = ResourceCost(resource=d["cost"]["resource"], amount=float(d["cost"]["amount"]))
+    skill_id = d["id"]
+    modifiers = [_modifier(m, parent_skill=skill_id) for m in d.get("modifiers", [])]
     return Skill(
-        id=d["id"],
+        id=skill_id,
         name=d["name"],
         tag=SkillTag(d["tag"]),
         max_rank=int(d.get("max_rank", 5)),
@@ -73,6 +91,7 @@ def _skill(d: dict[str, Any]) -> Skill:
         min_level=int(d.get("min_level", 1)),
         placeholder=bool(d.get("placeholder", False)),
         source_url=d.get("source_url"),
+        modifiers=modifiers,
     )
 
 

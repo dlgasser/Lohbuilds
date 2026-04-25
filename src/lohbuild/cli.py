@@ -16,6 +16,15 @@ def build_parser() -> argparse.ArgumentParser:
 
     leveling = sub.add_parser("warlock", help="Optimize a Warlock leveling build.")
     leveling.add_argument("--level", type=int, default=70, help="Target level (default 70).")
+    leveling.add_argument(
+        "--season-journey",
+        type=int,
+        default=0,
+        help=(
+            "Extra skill points earned from the Season Journey on top of the 1/level "
+            "leveling pool (cap 70). Total is hard-capped at 83. Default 0."
+        ),
+    )
     return parser
 
 
@@ -26,8 +35,13 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "warlock":
         cls = load_class("warlock")
         items = load_itemization()
-        result = optimize_leveling(cls, items, level_cap=args.level)
-        print(report(result, cls))
+        result = optimize_leveling(
+            cls,
+            items,
+            level_cap=args.level,
+            season_journey=args.season_journey,
+        )
+        print(report(result, cls, season_journey=args.season_journey))
         return 0
 
     parser.print_help()

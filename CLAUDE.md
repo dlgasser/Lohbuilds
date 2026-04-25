@@ -28,11 +28,11 @@ src/lohbuild/
 
 - **Composite score:** `0.6 * normalized_DPS + 0.4 * normalized_EHP`. Promote
   to a CLI flag once real data is in. Live in `scoring.py`.
-- **Total skill points: 83** (user-confirmed, source:
-  `news.blizzard.com/en-us/article/24267729/prepare-for-the-reckoning-lord-of-hatred-draws-near`).
-  The per-level schedule is not public; `optimizer.points_at_level()` linearly
-  interpolates from 0 at level 1 to 83 at level 70. Replace with the real
-  schedule when datamined.
+- **Skill point schedule: 1 per character level + Season Journey rewards**,
+  total cap 83 (user-confirmed). `points_at_level(level, season_journey)`
+  returns `min(level, 70) + max(season_journey, 0)` clamped to 83. CLI flag
+  `--season-journey N` controls how many journey points to assume; default 0.
+  Source: `news.blizzard.com/en-us/article/24267729/prepare-for-the-reckoning-lord-of-hatred-draws-near`.
 - **Skill bar cap:** 6.
 - **Allocator:** pure greedy per-level, no backtracking. Adequate for
   scaffolding; will likely need beam search or local-search polish once
@@ -87,12 +87,15 @@ Horadric Cube. See `src/lohbuild/model/gear.py`.
   system (charms socket into a Talisman to grant passive effects). None of
   those three sources are modeled yet — the `Passive` model class still
   exists and can be reused for Talisman/Charms when the schema lands.
-- **Per-skill modifier system (not yet modeled):** each active skill exposes
-  three branches with up to 12 modifier combinations — a Left-Path passive,
-  a Right-Path passive, and a Middle-Path transformative variant, plus a
-  Bonus Variant in branch 3 (1 of 3 build-defining properties). When we model
-  this, expect a `modifiers:` block under each skill in `warlock.yaml` and a
-  separate selection field on `SkillAllocation`.
+- **Per-skill modifier system (modeled):** each active skill exposes four
+  modifier slots — `left`, `right`, `middle` (transformative variant), and
+  `bonus` (build-defining unlock deeper in the tree). Each pick costs 1
+  point, has no rank, and is mutually exclusive within its (skill, slot).
+  Modifiers can require a minimum rank in the parent skill (`requires_rank`).
+  Data lives under each skill's `modifiers:` block in `warlock.yaml`; the
+  selection lives in `SkillAllocation.modifier_ids` and is applied via
+  `Build.total_stats()`. Modifier *names and stats* are placeholders — only
+  the structural rules are real.
 
 ## Skill names known (source: WebSearch snippets, not page-verified)
 

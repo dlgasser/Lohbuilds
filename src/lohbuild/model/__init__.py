@@ -1,5 +1,13 @@
 from .stats import StatBlock, DamageType
-from .skills import Skill, SkillEffect, Passive, SkillTag, ResourceCost
+from .skills import (
+    Modifier,
+    ModifierSlot,
+    Passive,
+    ResourceCost,
+    Skill,
+    SkillEffect,
+    SkillTag,
+)
 from .gear import (
     GearSlot,
     Affix,
@@ -21,6 +29,8 @@ __all__ = [
     "Passive",
     "SkillTag",
     "ResourceCost",
+    "Modifier",
+    "ModifierSlot",
     "GearSlot",
     "Affix",
     "Socket",

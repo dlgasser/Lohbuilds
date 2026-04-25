@@ -1,19 +1,20 @@
 # Warlock class data — Diablo 4 Lord of Hatred
 #
-# Skill names and skill categories were taken from WebSearch summaries of
-# maxroll.gg and other public sources (see CLAUDE.md). Per-skill numeric
-# values (cooldown, cast time, resource cost, scaling) were NOT scraped from a
-# live page — direct fetches to maxroll.gg / d4builds.gg / wowhead returned
-# HTTP 403. They are populated with best-effort values from search snippets
-# where available, and otherwise with conservative placeholders.
+# Skill names and categories come from WebSearch summaries of maxroll.gg and
+# the Blizzard reveal blog (see CLAUDE.md). Per-skill numeric values
+# (cooldown, cast time, resource cost, scaling) and ALL modifier data were
+# NOT scraped from a live page — direct fetches to maxroll / d4builds /
+# wowhead / Blizzard returned HTTP 403. Numbers are best-effort placeholders.
 #
-# Every entry carries `placeholder: true` until a real numeric source is
-# verified end-to-end against the in-game tooltip. The optimizer marks any
-# placeholder skill or passive in its report.
+# Every entry carries `placeholder: true` until verified against an in-game
+# tooltip. The optimizer marks any placeholder skill, passive, or modifier
+# in its report.
 #
-# User-confirmed rule (2026-04-25): every active skill has max_rank 15.
-# Secondary modifier / variant nodes are NOT raised; we do not model variants
-# yet, so this file simply sets max_rank: 15 on the ten active skills below.
+# User-confirmed rules (2026-04-25):
+#   - every active skill has max_rank 15
+#   - each modifier / variant pick costs 1 point and has no rank (binary)
+#   - within a skill's (slot) you pick at most one modifier
+#   - the four slots are: left, right, middle, bonus
 
 class_id: warlock
 name: Warlock
@@ -42,6 +43,28 @@ skills:
       damage_type: fire              # Hellfire school
       cast_time: 0.4
       targets: 1
+    modifiers:
+      - id: hellion_left_pierce
+        name: Piercing Sting
+        slot: left
+        requires_rank: 1
+        placeholder: true
+        notes: "Placeholder L-path: extra target."
+        stats: { additive_damage: 0.05 }
+      - id: hellion_right_eviscerate
+        name: Festering Sting
+        slot: right
+        requires_rank: 1
+        placeholder: true
+        notes: "Placeholder R-path: boost Eviscerate proc damage."
+        stats: { multiplicative_damage: 1.04 }
+      - id: hellion_middle_volatile
+        name: Volatile Sting
+        slot: middle
+        requires_rank: 5
+        placeholder: true
+        notes: "Placeholder M-path variant: explodes on Hex stacks."
+        stats: { multiplicative_damage: 1.10, crit_chance: 0.03 }
 
   - id: doom
     name: Doom
@@ -60,6 +83,25 @@ skills:
       cast_time: 0.4
       targets: 1
       applies_vulnerable: true       # proxy for Hex-stack crit boost until modeled
+    modifiers:
+      - id: doom_left_hex_stack
+        name: Compounding Hex
+        slot: left
+        requires_rank: 1
+        placeholder: true
+        stats: { crit_chance: 0.04 }
+      - id: doom_right_dread
+        name: Dreadful Doom
+        slot: right
+        requires_rank: 1
+        placeholder: true
+        stats: { multiplicative_damage: 1.05 }
+      - id: doom_middle_shadow_burst
+        name: Umbral Doom
+        slot: middle
+        requires_rank: 5
+        placeholder: true
+        stats: { multiplicative_damage: 1.08, vulnerable_damage: 1.30 }
 
   # ---------------- Core ----------------
   - id: hell_fracture
@@ -79,6 +121,32 @@ skills:
       cast_time: 0.6
       aoe: true
       targets: 3                     # snippet: chains up to 2 additional explosions
+    modifiers:
+      - id: fracture_left_brimstone
+        name: Brimstone Echo
+        slot: left
+        requires_rank: 1
+        placeholder: true
+        stats: { additive_damage: 0.06 }
+      - id: fracture_right_chain
+        name: Cascading Fracture
+        slot: right
+        requires_rank: 1
+        placeholder: true
+        stats: { multiplicative_damage: 1.06 }
+      - id: fracture_middle_triple
+        name: Triple Fracture
+        slot: middle
+        requires_rank: 5
+        placeholder: true
+        notes: "Inspired by the Spine of Tathamet snippet (every 3rd cast triple-fractures)."
+        stats: { multiplicative_damage: 1.15, crit_chance: 0.04 }
+      - id: fracture_bonus_volatility
+        name: Volatile Fracture
+        slot: bonus
+        requires_rank: 10
+        placeholder: true
+        stats: { multiplicative_damage: 1.20, crit_damage: 1.80 }
 
   - id: dread_claws
     name: Dread Claws
@@ -97,6 +165,32 @@ skills:
       cast_time: 0.5
       aoe: true
       targets: 4
+    modifiers:
+      - id: claws_left_shadowform
+        name: Shadowform Claws
+        slot: left
+        requires_rank: 1
+        placeholder: true
+        notes: "Snippet: extra claws fire per Shadowform stack."
+        stats: { multiplicative_damage: 1.08 }
+      - id: claws_right_pierce
+        name: Rending Claws
+        slot: right
+        requires_rank: 1
+        placeholder: true
+        stats: { additive_damage: 0.08 }
+      - id: claws_middle_swarm
+        name: Swarm of Claws
+        slot: middle
+        requires_rank: 5
+        placeholder: true
+        stats: { multiplicative_damage: 1.18, crit_chance: 0.04 }
+      - id: claws_bonus_litany
+        name: Litany of Sable
+        slot: bonus
+        requires_rank: 10
+        placeholder: true
+        stats: { multiplicative_damage: 1.25, crit_damage: 1.85 }
 
   # ---------------- Defensive ----------------
   - id: wall_of_agony
@@ -115,6 +209,19 @@ skills:
       self_buff:
         damage_reduction: 0.20
         armor: 200.0
+    modifiers:
+      - id: wall_left_reinforce
+        name: Reinforced Wall
+        slot: left
+        requires_rank: 1
+        placeholder: true
+        stats: { armor: 100.0, life: 60.0 }
+      - id: wall_right_thorns
+        name: Spiteful Wall
+        slot: right
+        requires_rank: 1
+        placeholder: true
+        stats: { multiplicative_damage: 1.04 }
 
   - id: nether_step
     name: Nether Step
@@ -131,6 +238,19 @@ skills:
       cast_time: 0.2
       aoe: true
       targets: 3
+    modifiers:
+      - id: nether_left_unhindered
+        name: Unhindered Step
+        slot: left
+        requires_rank: 1
+        placeholder: true
+        stats: { damage_reduction: 0.05 }
+      - id: nether_right_shadowstep
+        name: Shadowed Step
+        slot: right
+        requires_rank: 1
+        placeholder: true
+        stats: { multiplicative_damage: 1.05 }
 
   # ---------------- Archfiend (summon-empower) ----------------
   - id: profane_sentinel
@@ -150,6 +270,25 @@ skills:
       cooldown: 0.0
       cast_time: 0.5
       targets: 2
+    modifiers:
+      - id: sentinel_left_legion
+        name: Legion Sentinel
+        slot: left
+        requires_rank: 1
+        placeholder: true
+        stats: { multiplicative_damage: 1.06 }
+      - id: sentinel_right_warden
+        name: Warden Sentinel
+        slot: right
+        requires_rank: 1
+        placeholder: true
+        stats: { armor: 80.0, resist_all: 0.05 }
+      - id: sentinel_middle_archfiend
+        name: Archfiend Bond
+        slot: middle
+        requires_rank: 5
+        placeholder: true
+        stats: { multiplicative_damage: 1.12, attack_speed: 1.05 }
 
   # ---------------- Sigil ----------------
   - id: sigil_of_chaos
@@ -168,6 +307,31 @@ skills:
       aoe: true
       targets: 4
       applies_vulnerable: true
+    modifiers:
+      - id: sigil_left_overpower
+        name: Overpowering Sigil
+        slot: left
+        requires_rank: 1
+        placeholder: true
+        stats: { additive_damage: 0.07 }
+      - id: sigil_right_hexbound
+        name: Hexbound Sigil
+        slot: right
+        requires_rank: 1
+        placeholder: true
+        stats: { crit_chance: 0.04 }
+      - id: sigil_middle_chaos
+        name: Pure Chaos
+        slot: middle
+        requires_rank: 5
+        placeholder: true
+        stats: { multiplicative_damage: 1.14, vulnerable_damage: 1.30 }
+      - id: sigil_bonus_eternal
+        name: Eternal Sigil
+        slot: bonus
+        requires_rank: 10
+        placeholder: true
+        stats: { multiplicative_damage: 1.20, attack_speed: 1.08 }
 
   # ---------------- Ultimates ----------------
   - id: apocalypse
@@ -186,6 +350,25 @@ skills:
       aoe: true
       targets: 8
       applies_vulnerable: true
+    modifiers:
+      - id: apoc_left_meteor
+        name: Meteor Cascade
+        slot: left
+        requires_rank: 1
+        placeholder: true
+        stats: { multiplicative_damage: 1.10 }
+      - id: apoc_right_eternal
+        name: Eternal Suffering
+        slot: right
+        requires_rank: 1
+        placeholder: true
+        stats: { vulnerable_damage: 1.40 }
+      - id: apoc_middle_brimstone
+        name: Brimstone Apocalypse
+        slot: middle
+        requires_rank: 5
+        placeholder: true
+        stats: { multiplicative_damage: 1.20, crit_damage: 1.85 }
 
   - id: metamorphosis
     name: Metamorphosis
@@ -204,6 +387,25 @@ skills:
         damage_reduction: 0.30
         multiplicative_damage: 1.20
         attack_speed: 1.20
+    modifiers:
+      - id: meta_left_demon
+        name: Demonic Form
+        slot: left
+        requires_rank: 1
+        placeholder: true
+        stats: { multiplicative_damage: 1.08 }
+      - id: meta_right_warden
+        name: Wardened Form
+        slot: right
+        requires_rank: 1
+        placeholder: true
+        stats: { damage_reduction: 0.06, life: 100.0 }
+      - id: meta_middle_eternal
+        name: Eternal Demon
+        slot: middle
+        requires_rank: 5
+        placeholder: true
+        stats: { multiplicative_damage: 1.18, crit_chance: 0.05 }
 
 # Lord of Hatred removes all passive nodes from class skill trees. Passive-
 # style power is now sourced from Legendary Aspects, Uniques, and the new

@@ -39,6 +39,35 @@ class SkillEffect:
     self_buff: StatBlock | None = None
 
 
+class ModifierSlot(str, Enum):
+    """Which branch slot a modifier occupies on a skill.
+
+    LoH skill trees give each active skill four modifier slots: Left/Right
+    Path passives (early branches), a Middle Path transformative variant,
+    and a Bonus variant unlocked deeper in the tree. Within a slot the
+    options are mutually exclusive — pick one. Each pick costs 1 skill point
+    and has no rank.
+    """
+
+    LEFT = "left"
+    RIGHT = "right"
+    MIDDLE = "middle"
+    BONUS = "bonus"
+
+
+@dataclass
+class Modifier:
+    id: str
+    name: str
+    slot: ModifierSlot
+    parent_skill: str
+    stats: StatBlock = field(default_factory=StatBlock)
+    requires_rank: int = 1
+    placeholder: bool = False
+    source_url: str | None = None
+    notes: str = ""
+
+
 @dataclass
 class Skill:
     id: str
@@ -51,6 +80,7 @@ class Skill:
     min_level: int = 1
     placeholder: bool = False
     source_url: str | None = None
+    modifiers: list[Modifier] = field(default_factory=list)
 
     def effect_at(self, rank: int) -> SkillEffect:
         if rank <= 0:
