@@ -12,6 +12,8 @@ class SkillTag(str, Enum):
     DEFENSIVE = "defensive"
     MOBILITY = "mobility"
     CONJURATION = "conjuration"
+    ARCHFIEND = "archfiend"
+    SIGIL = "sigil"
     MASTERY = "mastery"
     ULTIMATE = "ultimate"
     PASSIVE = "passive"

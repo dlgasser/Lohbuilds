@@ -1,97 +1,148 @@
-# PLACEHOLDER WARLOCK DATA
+# Warlock class data — Diablo 4 Lord of Hatred
 #
-# Numbers below are shaped to exercise the optimizer, not to recommend a real
-# build. Replace each entry with values scraped from d4builds.gg once the
-# Lord of Hatred class data is published. The `source_url` field on each entry
-# is the page we plan to pull from.
+# Skill names and skill categories were taken from WebSearch summaries of
+# maxroll.gg and other public sources (see CLAUDE.md). Per-skill numeric
+# values (cooldown, cast time, resource cost, scaling) were NOT scraped from a
+# live page — direct fetches to maxroll.gg / d4builds.gg / wowhead returned
+# HTTP 403. They are populated with best-effort values from search snippets
+# where available, and otherwise with conservative placeholders.
+#
+# Every entry carries `placeholder: true` until a real numeric source is
+# verified end-to-end against the in-game tooltip. The optimizer marks any
+# placeholder skill or passive in its report.
+#
+# User-confirmed rule (2026-04-25): Basic-tag skills now have max_rank 15.
+# Other categories assumed unchanged at 5 ranks unless told otherwise.
 
 class_id: warlock
 name: Warlock
 
-# Per-level base stats granted automatically. Currently a placeholder curve.
+# Per-level base stats granted automatically. Placeholder curve.
 base_stats_per_level:
   life: 14.0
   armor: 2.0
   weapon_damage: 1.0
 
 skills:
-  - id: hex_bolt
-    name: Hex Bolt
+  # ---------------- Basic (max_rank 15 per user) ----------------
+  - id: hellion_sting
+    name: Hellion Sting
     tag: basic
-    max_rank: 5
+    max_rank: 15
     min_level: 1
     placeholder: true
-    source_url: https://d4builds.gg/database/warlock/skills/hex-bolt
-    per_rank_increment: 0.10
+    source_url: https://maxroll.gg/d4/getting-started/warlock-class-overview
+    per_rank_increment: 0.06
     cost:
-      resource: mana
+      resource: wrath
       amount: 0
     base_effect:
-      base_damage_pct: 0.30
-      damage_type: shadow
+      base_damage_pct: 0.66          # snippet: "66% weapon damage"
+      damage_type: fire              # Hellfire school
       cast_time: 0.4
       targets: 1
 
-  - id: cinder_lash
-    name: Cinder Lash
+  - id: doom
+    name: Doom
+    tag: basic
+    max_rank: 15
+    min_level: 1
+    placeholder: true
+    source_url: https://maxroll.gg/d4/getting-started/warlock-class-overview
+    per_rank_increment: 0.06
+    cost:
+      resource: wrath
+      amount: 0
+    base_effect:
+      base_damage_pct: 0.40          # placeholder; snippet only confirms it Hexes
+      damage_type: shadow            # Abyss school
+      cast_time: 0.4
+      targets: 1
+      applies_vulnerable: true       # proxy for Hex-stack crit boost until modeled
+
+  # ---------------- Core ----------------
+  - id: hell_fracture
+    name: Hell Fracture
     tag: core
     max_rank: 5
     min_level: 2
     placeholder: true
-    source_url: https://d4builds.gg/database/warlock/skills/cinder-lash
+    source_url: https://maxroll.gg/d4/getting-started/warlock-class-overview
     per_rank_increment: 0.10
     cost:
-      resource: mana
-      amount: 25
+      resource: wrath
+      amount: 30
     base_effect:
-      base_damage_pct: 0.85
+      base_damage_pct: 1.80          # snippet: "180% damage"
       damage_type: fire
       cast_time: 0.6
       aoe: true
-      targets: 4
-      applies_vulnerable: true
+      targets: 3                     # snippet: chains up to 2 additional explosions
 
-  - id: warding_sigil
-    name: Warding Sigil
+  - id: dread_claws
+    name: Dread Claws
+    tag: core
+    max_rank: 5
+    min_level: 2
+    placeholder: true
+    source_url: https://maxroll.gg/d4/getting-started/warlock-class-overview
+    per_rank_increment: 0.10
+    cost:
+      resource: wrath
+      amount: 25
+    base_effect:
+      base_damage_pct: 2.60          # snippet: 4 claws x 65% damage
+      damage_type: shadow            # Abyss school
+      cast_time: 0.5
+      aoe: true
+      targets: 4
+
+  # ---------------- Defensive ----------------
+  - id: wall_of_agony
+    name: Wall of Agony
     tag: defensive
     max_rank: 5
     min_level: 6
     placeholder: true
-    source_url: https://d4builds.gg/database/warlock/skills/warding-sigil
+    source_url: https://maxroll.gg/d4/getting-started/warlock-class-overview
     per_rank_increment: 0.05
     base_effect:
       base_damage_pct: 0.0
       damage_type: shadow
-      cooldown: 12.0
+      cooldown: 14.0
       cast_time: 0.3
       self_buff:
         damage_reduction: 0.20
         armor: 200.0
 
-  - id: phantom_step
-    name: Phantom Step
-    tag: mobility
+  - id: nether_step
+    name: Nether Step
+    tag: defensive
     max_rank: 3
     min_level: 8
     placeholder: true
-    source_url: https://d4builds.gg/database/warlock/skills/phantom-step
+    source_url: https://maxroll.gg/d4/getting-started/warlock-class-overview
     per_rank_increment: 0.05
     base_effect:
-      base_damage_pct: 0.20
+      base_damage_pct: 0.30
       damage_type: shadow
       cooldown: 9.0
       cast_time: 0.2
       aoe: true
       targets: 3
 
-  - id: bound_familiar
-    name: Bound Familiar
-    tag: conjuration
+  # ---------------- Archfiend (summon-empower) ----------------
+  - id: profane_sentinel
+    name: Profane Sentinel
+    tag: archfiend
     max_rank: 5
     min_level: 15
     placeholder: true
-    source_url: https://d4builds.gg/database/warlock/skills/bound-familiar
+    source_url: https://maxroll.gg/d4/getting-started/warlock-class-overview
     per_rank_increment: 0.10
+    cost:
+      resource: dominance
+      amount: 30
     base_effect:
       base_damage_pct: 0.55
       damage_type: lightning
@@ -99,30 +150,71 @@ skills:
       cast_time: 0.5
       targets: 2
 
-  - id: hatreds_grasp
-    name: Hatred's Grasp
+  # ---------------- Sigil ----------------
+  - id: sigil_of_chaos
+    name: Sigil of Chaos
+    tag: sigil
+    max_rank: 5
+    min_level: 12
+    placeholder: true
+    source_url: https://maxroll.gg/d4/getting-started/warlock-class-overview
+    per_rank_increment: 0.08
+    base_effect:
+      base_damage_pct: 0.90
+      damage_type: fire
+      cooldown: 11.0
+      cast_time: 0.5
+      aoe: true
+      targets: 4
+      applies_vulnerable: true
+
+  # ---------------- Ultimates ----------------
+  - id: apocalypse
+    name: Apocalypse
     tag: ultimate
     max_rank: 5
     min_level: 25
     placeholder: true
-    source_url: https://d4builds.gg/database/warlock/skills/hatreds-grasp
+    source_url: https://maxroll.gg/d4/getting-started/warlock-class-overview
     per_rank_increment: 0.10
     base_effect:
       base_damage_pct: 3.50
-      damage_type: shadow
+      damage_type: fire
       cooldown: 60.0
       cast_time: 0.8
       aoe: true
       targets: 8
       applies_vulnerable: true
 
+  - id: metamorphosis
+    name: Metamorphosis
+    tag: ultimate
+    max_rank: 5
+    min_level: 25
+    placeholder: true
+    source_url: https://maxroll.gg/d4/getting-started/warlock-class-overview
+    per_rank_increment: 0.10
+    base_effect:
+      base_damage_pct: 1.20
+      damage_type: shadow
+      cooldown: 50.0
+      cast_time: 0.4
+      self_buff:
+        damage_reduction: 0.30
+        multiplicative_damage: 1.20
+        attack_speed: 1.20
+
+# All passive names below are placeholders. The Warlock passive tree is
+# documented (Volatility / Brimstone / Hex / Vollach cluster) but per-node
+# names and per-rank effects were not extractable from search snippets alone.
+# Replace once a real source is reachable.
 passives:
-  - id: dark_attunement
-    name: Dark Attunement
+  - id: volatility_focus
+    name: Volatility Focus
     max_rank: 3
     min_level: 5
     placeholder: true
-    source_url: https://d4builds.gg/database/warlock/passives/dark-attunement
+    source_url: https://maxroll.gg/d4/getting-started/warlock-class-overview
     per_rank:
       additive_damage: 0.06
 
@@ -131,17 +223,17 @@ passives:
     max_rank: 3
     min_level: 5
     placeholder: true
-    source_url: https://d4builds.gg/database/warlock/passives/hexed-flesh
+    source_url: https://maxroll.gg/d4/getting-started/warlock-class-overview
     per_rank:
       life: 80.0
       damage_reduction: 0.03
 
-  - id: searing_will
-    name: Searing Will
+  - id: brimstone_will
+    name: Brimstone Will
     max_rank: 3
     min_level: 10
     placeholder: true
-    source_url: https://d4builds.gg/database/warlock/passives/searing-will
+    source_url: https://maxroll.gg/d4/getting-started/warlock-class-overview
     per_rank:
       multiplicative_damage: 1.04
 
@@ -150,7 +242,7 @@ passives:
     max_rank: 3
     min_level: 15
     placeholder: true
-    source_url: https://d4builds.gg/database/warlock/passives/warden-of-bone
+    source_url: https://maxroll.gg/d4/getting-started/warlock-class-overview
     per_rank:
       armor: 60.0
       resist_all: 0.04
@@ -160,8 +252,8 @@ passives:
     max_rank: 1
     min_level: 30
     placeholder: true
-    source_url: https://d4builds.gg/database/warlock/passives/covenant-of-hatred
-    requires: [dark_attunement, searing_will]
+    source_url: https://maxroll.gg/d4/getting-started/warlock-class-overview
+    requires: [volatility_focus, brimstone_will]
     per_rank:
       multiplicative_damage: 1.10
       crit_damage: 1.65
