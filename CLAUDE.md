@@ -28,7 +28,9 @@ src/lohbuild/
 
 - **Composite score:** `0.6 * normalized_DPS + 0.4 * normalized_EHP`. Promote
   to a CLI flag once real data is in. Live in `scoring.py`.
-- **Skill points per level:** 1 (constant). Real curve goes here when known.
+- **Skill points per level:** 2 (constant). Bumped from 1 because the user
+  confirmed Lord of Hatred raises the total skill-point pool. The exact curve
+  is not public yet; revisit when datamined.
 - **Skill bar cap:** 6.
 - **Allocator:** pure greedy per-level, no backtracking. Adequate for
   scaffolding; will likely need beam search or local-search polish once
@@ -72,9 +74,13 @@ Horadric Cube. See `src/lohbuild/model/gear.py`.
   **Eviscerate** (instant 20% of bleed life, plus 12s DoT).
 - Skill categories shipped: Basic, Core, Defensive, Archfiend (summon), Sigil,
   Ultimate.
-- **User-confirmed rule (2026-04-25):** Base/Basic skills have **max rank
-  15** (was 5). Other categories: assumed unchanged at 5 unless told
-  otherwise — confirm with the user before raising.
+- **User-confirmed rules (2026-04-25):**
+  - Every active skill has **max rank 15** (was 5). Secondary modifier /
+    variant nodes are *not* raised — they keep their pre-LoH caps. We do not
+    model variant nodes yet.
+  - Total available skill points is **higher** than pre-LoH; exact curve not
+    given. Currently using 2 points/level as a holding value (see
+    `optimizer.SKILL_POINTS_PER_LEVEL`).
 
 ## Skill names known (source: WebSearch snippets, not page-verified)
 

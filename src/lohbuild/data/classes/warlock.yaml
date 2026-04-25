@@ -11,8 +11,9 @@
 # verified end-to-end against the in-game tooltip. The optimizer marks any
 # placeholder skill or passive in its report.
 #
-# User-confirmed rule (2026-04-25): Basic-tag skills now have max_rank 15.
-# Other categories assumed unchanged at 5 ranks unless told otherwise.
+# User-confirmed rule (2026-04-25): every active skill has max_rank 15.
+# Secondary modifier / variant nodes are NOT raised; we do not model variants
+# yet, so this file simply sets max_rank: 15 on the ten active skills below.
 
 class_id: warlock
 name: Warlock
@@ -64,7 +65,7 @@ skills:
   - id: hell_fracture
     name: Hell Fracture
     tag: core
-    max_rank: 5
+    max_rank: 15
     min_level: 2
     placeholder: true
     source_url: https://maxroll.gg/d4/getting-started/warlock-class-overview
@@ -82,7 +83,7 @@ skills:
   - id: dread_claws
     name: Dread Claws
     tag: core
-    max_rank: 5
+    max_rank: 15
     min_level: 2
     placeholder: true
     source_url: https://maxroll.gg/d4/getting-started/warlock-class-overview
@@ -101,7 +102,7 @@ skills:
   - id: wall_of_agony
     name: Wall of Agony
     tag: defensive
-    max_rank: 5
+    max_rank: 15
     min_level: 6
     placeholder: true
     source_url: https://maxroll.gg/d4/getting-started/warlock-class-overview
@@ -118,7 +119,7 @@ skills:
   - id: nether_step
     name: Nether Step
     tag: defensive
-    max_rank: 3
+    max_rank: 15
     min_level: 8
     placeholder: true
     source_url: https://maxroll.gg/d4/getting-started/warlock-class-overview
@@ -135,7 +136,7 @@ skills:
   - id: profane_sentinel
     name: Profane Sentinel
     tag: archfiend
-    max_rank: 5
+    max_rank: 15
     min_level: 15
     placeholder: true
     source_url: https://maxroll.gg/d4/getting-started/warlock-class-overview
@@ -154,7 +155,7 @@ skills:
   - id: sigil_of_chaos
     name: Sigil of Chaos
     tag: sigil
-    max_rank: 5
+    max_rank: 15
     min_level: 12
     placeholder: true
     source_url: https://maxroll.gg/d4/getting-started/warlock-class-overview
@@ -172,7 +173,7 @@ skills:
   - id: apocalypse
     name: Apocalypse
     tag: ultimate
-    max_rank: 5
+    max_rank: 15
     min_level: 25
     placeholder: true
     source_url: https://maxroll.gg/d4/getting-started/warlock-class-overview
@@ -189,7 +190,7 @@ skills:
   - id: metamorphosis
     name: Metamorphosis
     tag: ultimate
-    max_rank: 5
+    max_rank: 15
     min_level: 25
     placeholder: true
     source_url: https://maxroll.gg/d4/getting-started/warlock-class-overview

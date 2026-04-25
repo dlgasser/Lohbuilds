@@ -16,9 +16,14 @@ from .model.enemy import EnemyProfile
 from .scoring import Score, score_build
 
 
-# How many skill points are typically available per character level. Replace
-# with the real curve when datamines are available.
-SKILL_POINTS_PER_LEVEL = 1
+# How many skill points are typically available per character level.
+#
+# Pre-LoH this was 1 (≈58 points by level 50). Lord of Hatred raises every
+# skill's base cap from 5 to 15 ranks, and the user has confirmed the total
+# point pool is also higher. Until the real curve is published we use 2/level
+# (140 points by level 70) as a moderate guess. Override here when datamines
+# land.
+SKILL_POINTS_PER_LEVEL = 2
 MAX_BAR = 6
 
 
