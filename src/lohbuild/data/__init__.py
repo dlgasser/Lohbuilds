@@ -57,6 +57,8 @@ def _skill_effect(d: dict[str, Any]) -> SkillEffect:
         targets=int(d.get("targets", 1)),
         applies_vulnerable=bool(d.get("applies_vulnerable", False)),
         self_buff=_statblock(d.get("self_buff")) if d.get("self_buff") else None,
+        lucky_hit_chance=float(d.get("lucky_hit_chance", 0.0)),
+        school=str(d.get("school", "")),
     )
 
 

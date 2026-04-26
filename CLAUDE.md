@@ -4,7 +4,8 @@
 
 A Python build optimizer for the Diablo 4 *Lord of Hatred* expansion (release
 2026-04-28). Initial scope is a **Warlock 1-70 leveling build** that does not
-require unique drops. Target runtime is Windows 11.
+require unique drops. Local development is on Linux/macOS; deployment target
+is Windows 11.
 
 ## Branch convention
 
@@ -40,16 +41,21 @@ src/lohbuild/
 
 ## Data source policy
 
-- Primary source for class data: **maxroll.gg** (specifically
-  `https://maxroll.gg/d4/getting-started/warlock-class-overview`) and
-  `d4builds.gg`.
-- **Both sites currently return HTTP 403 to WebFetch (Cloudflare).** Do not
-  attempt to bypass. Use WebSearch summaries when possible, otherwise ask the
-  user to paste the data, or have them run a local scrape and commit the YAML.
-- Every YAML entry that is not directly verified must carry `placeholder: true`
-  and a `source_url` pointing at where the real data should come from. The
-  optimizer report surfaces `[placeholder]` next to any name pulled from such
-  an entry.
+- Primary source for Warlock class data: **maxroll.gg**, specifically
+  `https://maxroll.gg/d4/getting-started/warlock-class-overview`. As of
+  2026-04-26 the page is fully ingested into `warlock.yaml` (skill names,
+  damage %, lucky-hit chance, cooldowns, modifier names, school tags).
+- **Maxroll, d4builds, Wowhead, and Fextralife return HTTP 403 to WebFetch
+  (Cloudflare).** Do not attempt to bypass. To refresh data: have the user
+  download the page locally and either drop the HTML into the repo or paste
+  the relevant content into the chat.
+- `placeholder: true` is now used selectively. Skill structural data
+  (name, damage %, lucky-hit, cooldown, AoE shape, school) is NOT placeholder
+  where Maxroll quoted it. Modifier *stat values* ARE placeholder — the real
+  modifier effects are conditional ("x50% damage when…"), and the StatBlock
+  model only handles flat multipliers, so the YAML stats are conservative
+  best-effort approximations. The optimizer surfaces `[placeholder]` next
+  to any modifier or item still flagged.
 
 ## Itemization model
 
@@ -87,37 +93,56 @@ Horadric Cube. See `src/lohbuild/model/gear.py`.
   system (charms socket into a Talisman to grant passive effects). None of
   those three sources are modeled yet — the `Passive` model class still
   exists and can be reused for Talisman/Charms when the schema lands.
-- **Per-skill modifier system (modeled):** each active skill exposes four
-  modifier slots — `left`, `right`, `middle` (transformative variant), and
-  `bonus` (build-defining unlock deeper in the tree). Each pick costs 1
-  point, has no rank, and is mutually exclusive within its (skill, slot).
-  Modifiers can require a minimum rank in the parent skill (`requires_rank`).
-  Data lives under each skill's `modifiers:` block in `warlock.yaml`; the
+- **Per-skill modifier system (modeled):** verified against Maxroll, each
+  active skill has three modifier slots:
+  - `enhance1` — pick 1 of 2 ("Enhancement 1" on Maxroll)
+  - `enhance2` — pick 1 of 2 ("Enhancement 2")
+  - `variant` — pick 1 of 3 (transformative; often re-tags the skill as
+    Hellfire or Abyss)
+
+  Each pick costs 1 point, has no rank, and is mutually exclusive within
+  its slot (so a fully kitted skill spends 3 points on modifiers). Modifiers
+  can require a minimum rank in the parent skill (`requires_rank`). Data
+  lives under each skill's `modifiers:` block in `warlock.yaml`; the
   selection lives in `SkillAllocation.modifier_ids` and is applied via
-  `Build.total_stats()`. Modifier *names and stats* are placeholders — only
-  the structural rules are real.
+  `Build.total_stats()`. Modifier *names* are real (Maxroll); *stat
+  approximations* are placeholders.
+- **Only one ultimate skill can be selected** (Maxroll: "Only one can be
+  chosen"). Enforced in `optimizer._candidate_targets`.
+- **Lucky-hit chance** is parsed onto `SkillEffect.lucky_hit_chance` for
+  each skill. Not yet used in scoring — wire it in once we model the
+  lucky-hit triggers (resource gen, on-hit explosions, etc.).
+- **Hellfire / Abyss school tags** parsed onto `SkillEffect.school`. Not
+  yet used in scoring — wire in when we model Volatility / Shadowform.
 
-## Skill names known (source: WebSearch snippets, not page-verified)
+## Skill catalog (24 skills, source: maxroll.gg ingestion 2026-04-26)
 
-- Basic: Command Fallen, Doom, Hellion Sting, Molten Bomb
-- Core: Blazing Scream, Bombardment, Dread Claws, Hell Fracture, Umbral Chains
-- Defensive: Dark Prison, Nether Step, Tortured Wretch, Wall of Agony
-- Archfiend: Infernal Breath, Profane Sentinel, Rampage, Tyrant's Grasp
-- Sigil: Sigil of Chaos, Sigil of Subversion, Sigil of Summons
-- Ultimate: Apocalypse, Fiend of Abaddon, Metamorphosis, Terror Swarm
+All damage %, lucky-hit, and cooldowns below come from the live Maxroll
+page; modifier names are 1:1 with the Enhancement 1 / Enhancement 2 /
+Variant tables on that page.
 
-Numbers I have from snippets (treat as best-effort, not page-verified):
-
-- Hellion Sting: 66% weapon damage, 5% chance to apply Eviscerate (660% on
-  proc).
-- Hell Fracture: 180% damage, chains up to 2 additional explosions.
-- Dread Claws: 4 claws × 65% damage each.
+- **Basic** (4): Command Fallen, Molten Bomb, Doom, Hellion Sting
+- **Core** (5): Bombardment, Hell Fracture, Umbral Chains, Blazing Scream,
+  Dread Claws
+- **Defensive** (4): Wall of Agony, Tortured Wretch, Dark Prison, Nether Step
+- **Archfiend** (4): Rampage, Infernal Breath, Tyrant's Grasp,
+  Profane Sentinel
+- **Sigil** (3): Sigil of Subversion, Sigil of Summons, Sigil of Chaos
+- **Ultimate** (4): Fiend of Abbadon, Apocalypse, Terror Swarm, Metamorphosis
 
 ## Local commands
 
+Editable install (preferred — see README for venv setup):
+
+```bash
+lohbuild warlock --level 70
+lohbuild warlock --level 70 --season-journey 13   # full 83-point pool
+```
+
+Without install:
+
 ```bash
 PYTHONPATH=src python3 -m lohbuild.cli warlock --level 70
-PYTHONPATH=src python3 -m lohbuild.cli warlock --level 25
 ```
 
 ## Known calibration issues (track before adding features)

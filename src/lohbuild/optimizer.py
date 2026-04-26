@@ -62,9 +62,28 @@ def _starter_loadout(items: ItemizationData) -> Loadout:
 def _candidate_targets(build: Build, cls: ClassData) -> list[str]:
     """Skill ranks, passives, and modifier picks the build could spend on."""
 
+    from .model import SkillTag
+
+    # Per Maxroll: "Only one ultimate can be chosen". Once any ultimate has
+    # rank > 0, lock out the others (and their modifiers).
+    chosen_ultimate = next(
+        (
+            sid
+            for sid, rank in build.allocation.skill_ranks.items()
+            if rank > 0 and cls.skills.get(sid) and cls.skills[sid].tag == SkillTag.ULTIMATE
+        ),
+        None,
+    )
+
     out: list[str] = []
     for skill in cls.skills.values():
         if skill.min_level > build.level:
+            continue
+        if (
+            skill.tag == SkillTag.ULTIMATE
+            and chosen_ultimate is not None
+            and skill.id != chosen_ultimate
+        ):
             continue
         rank = build.allocation.skill_ranks.get(skill.id, 0)
         if rank < skill.max_rank:

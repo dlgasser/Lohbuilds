@@ -1,20 +1,25 @@
 # Warlock class data — Diablo 4 Lord of Hatred
 #
-# Skill names and categories come from WebSearch summaries of maxroll.gg and
-# the Blizzard reveal blog (see CLAUDE.md). Per-skill numeric values
-# (cooldown, cast time, resource cost, scaling) and ALL modifier data were
-# NOT scraped from a live page — direct fetches to maxroll / d4builds /
-# wowhead / Blizzard returned HTTP 403. Numbers are best-effort placeholders.
+# Skill names, base damage %, lucky-hit chance, cooldowns, AoE shape,
+# Hellfire/Abyss school assignment, and modifier names are sourced from the
+# Maxroll Warlock class overview (downloaded HTML, parsed 2026-04-26):
+#   https://maxroll.gg/d4/getting-started/warlock-class-overview
 #
-# Every entry carries `placeholder: true` until verified against an in-game
-# tooltip. The optimizer marks any placeholder skill, passive, or modifier
-# in its report.
+# `placeholder: true` is now used selectively. The skill structural data
+# (name, damage_pct, lucky_hit, cooldown, aoe, school) is NOT placeholder
+# where Maxroll quoted it. Modifier stat values ARE placeholder — the real
+# effects are conditional / situational (e.g. "x50% damage when..." with
+# a trigger), and the StatBlock we have today only models flat multipliers,
+# so the stats below are conservative best-effort approximations.
 #
-# User-confirmed rules (2026-04-25):
+# Per-skill rank-scaling (`per_rank_increment`) is not in the Maxroll
+# overview; held at 0.10 / rank pending datamines.
+#
+# User-confirmed rules (re-stated):
 #   - every active skill has max_rank 15
-#   - each modifier / variant pick costs 1 point and has no rank (binary)
-#   - within a skill's (slot) you pick at most one modifier
-#   - the four slots are: left, right, middle, bonus
+#   - each modifier pick costs 1 point and has no rank
+#   - 3 slots per skill: enhance1 (1 of 2), enhance2 (1 of 2), variant (1 of 3)
+#   - only one ultimate skill can be selected (Maxroll: "Only one can be chosen")
 
 class_id: warlock
 name: Warlock
@@ -26,392 +31,579 @@ base_stats_per_level:
   weapon_damage: 1.0
 
 skills:
-  # ---------------- Basic (max_rank 15 per user) ----------------
-  - id: hellion_sting
-    name: Hellion Sting
+  # =========================================================================
+  # Basic Skills
+  # =========================================================================
+  - id: command_fallen
+    name: Command Fallen
     tag: basic
     max_rank: 15
     min_level: 1
-    placeholder: true
     source_url: https://maxroll.gg/d4/getting-started/warlock-class-overview
-    per_rank_increment: 0.06
-    cost:
-      resource: wrath
-      amount: 0
+    per_rank_increment: 0.10
+    cost: { resource: wrath, amount: 0 }
     base_effect:
-      base_damage_pct: 0.66          # snippet: "66% weapon damage"
-      damage_type: fire              # Hellfire school
-      cast_time: 0.4
-      targets: 1
+      base_damage_pct: 0.80
+      damage_type: fire
+      cast_time: 0.5
+      lucky_hit_chance: 0.30
     modifiers:
-      - id: hellion_left_pierce
-        name: Piercing Sting
-        slot: left
-        requires_rank: 1
-        placeholder: true
-        notes: "Placeholder L-path: extra target."
-        stats: { additive_damage: 0.05 }
-      - id: hellion_right_eviscerate
-        name: Festering Sting
-        slot: right
-        requires_rank: 1
-        placeholder: true
-        notes: "Placeholder R-path: boost Eviscerate proc damage."
-        stats: { multiplicative_damage: 1.04 }
-      - id: hellion_middle_volatile
-        name: Volatile Sting
-        slot: middle
-        requires_rank: 5
-        placeholder: true
-        notes: "Placeholder M-path variant: explodes on Hex stacks."
-        stats: { multiplicative_damage: 1.10, crit_chance: 0.03 }
+      - { id: cf_e1_lifetime,  name: "Lifetime Damage",  slot: enhance1, requires_rank: 1, placeholder: true, stats: { multiplicative_damage: 1.15 } }
+      - { id: cf_e1_dominance, name: "Dominance",        slot: enhance1, requires_rank: 1, placeholder: true, stats: { multiplicative_damage: 1.04 } }
+      - { id: cf_e2_per_demon, name: "Damage Per Demon", slot: enhance2, requires_rank: 5, placeholder: true, stats: { multiplicative_damage: 1.10 } }
+      - { id: cf_e2_wrath,     name: "Wrath",            slot: enhance2, requires_rank: 5, placeholder: true, stats: { multiplicative_damage: 1.04 } }
+      - { id: cf_v_mega,       name: "Mega Lunatic",     slot: variant,  requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.20 } }
+      - { id: cf_v_meat,       name: "Meat Shields",     slot: variant,  requires_rank: 10, placeholder: true, stats: { armor: 100.0, life: 60.0 } }
+      - { id: cf_v_army,       name: "Fallen Army",      slot: variant,  requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.18 } }
+
+  - id: molten_bomb
+    name: Molten Bomb
+    tag: basic
+    max_rank: 15
+    min_level: 1
+    source_url: https://maxroll.gg/d4/getting-started/warlock-class-overview
+    per_rank_increment: 0.10
+    cost: { resource: wrath, amount: 0 }
+    base_effect:
+      base_damage_pct: 0.75
+      damage_type: fire
+      cast_time: 0.5
+      aoe: true
+      targets: 3
+      lucky_hit_chance: 0.27
+      school: hellfire
+    modifiers:
+      - { id: mb_e1_wrath,    name: "Wrath",         slot: enhance1, requires_rank: 1, placeholder: true, stats: { multiplicative_damage: 1.04 } }
+      - { id: mb_e1_ranged,   name: "Ranged Damage", slot: enhance1, requires_rank: 1, placeholder: true, stats: { multiplicative_damage: 1.20 } }
+      - { id: mb_e2_area,     name: "Area Bonus",    slot: enhance2, requires_rank: 5, placeholder: true, stats: { multiplicative_damage: 1.15 } }
+      - { id: mb_e2_knock,    name: "Knock Down",    slot: enhance2, requires_rank: 5, placeholder: true, stats: { multiplicative_damage: 1.05 } }
+      - { id: mb_v_brimstone, name: "Brimstone Bomb",slot: variant,  requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.18 } }
+      - { id: mb_v_turret,    name: "Demon Turret",  slot: variant,  requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.20 } }
+      - { id: mb_v_cluster,   name: "Cluster Bomb",  slot: variant,  requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.15 } }
 
   - id: doom
     name: Doom
     tag: basic
     max_rank: 15
     min_level: 1
-    placeholder: true
     source_url: https://maxroll.gg/d4/getting-started/warlock-class-overview
-    per_rank_increment: 0.06
-    cost:
-      resource: wrath
-      amount: 0
+    per_rank_increment: 0.10
+    cost: { resource: wrath, amount: 0 }
     base_effect:
-      base_damage_pct: 0.40          # placeholder; snippet only confirms it Hexes
-      damage_type: shadow            # Abyss school
+      base_damage_pct: 0.50
+      damage_type: shadow
       cast_time: 0.4
-      targets: 1
-      applies_vulnerable: true       # proxy for Hex-stack crit boost until modeled
+      lucky_hit_chance: 0.20
     modifiers:
-      - id: doom_left_hex_stack
-        name: Compounding Hex
-        slot: left
-        requires_rank: 1
-        placeholder: true
-        stats: { crit_chance: 0.04 }
-      - id: doom_right_dread
-        name: Dreadful Doom
-        slot: right
-        requires_rank: 1
-        placeholder: true
-        stats: { multiplicative_damage: 1.05 }
-      - id: doom_middle_shadow_burst
-        name: Umbral Doom
-        slot: middle
-        requires_rank: 5
-        placeholder: true
-        stats: { multiplicative_damage: 1.08, vulnerable_damage: 1.30 }
+      - { id: doom_e1_wrath,   name: "Wrath",        slot: enhance1, requires_rank: 1, placeholder: true, stats: { multiplicative_damage: 1.04 } }
+      - { id: doom_e1_damage,  name: "Damage",       slot: enhance1, requires_rank: 1, placeholder: true, stats: { multiplicative_damage: 1.12 } }
+      - { id: doom_e2_echo,    name: "Echo",         slot: enhance2, requires_rank: 5, placeholder: true, stats: { multiplicative_damage: 1.08 } }
+      - { id: doom_e2_assim,   name: "Assimilation", slot: enhance2, requires_rank: 5, placeholder: true, stats: { vulnerable_damage: 1.30 } }
+      - { id: doom_v_contagion,name: "Contagion",    slot: variant,  requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.15 } }
+      - { id: doom_v_jailer,   name: "Jailer",       slot: variant,  requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.10 } }
+      - { id: doom_v_doomfire, name: "Doomfire Ritual", slot: variant, requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.20, crit_chance: 0.05 } }
 
-  # ---------------- Core ----------------
+  - id: hellion_sting
+    name: Hellion Sting
+    tag: basic
+    max_rank: 15
+    min_level: 1
+    source_url: https://maxroll.gg/d4/getting-started/warlock-class-overview
+    per_rank_increment: 0.10
+    cost: { resource: wrath, amount: 0 }
+    base_effect:
+      base_damage_pct: 0.66
+      damage_type: fire
+      cast_time: 0.4
+      lucky_hit_chance: 0.25
+    modifiers:
+      - { id: hs_e1_wrath,    name: "Wrath",     slot: enhance1, requires_rank: 1, placeholder: true, stats: { multiplicative_damage: 1.05 } }
+      - { id: hs_e1_damage,   name: "Damage",    slot: enhance1, requires_rank: 1, placeholder: true, stats: { multiplicative_damage: 1.20 } }
+      - { id: hs_e2_fortify,  name: "Fortify",   slot: enhance2, requires_rank: 5, placeholder: true, stats: { life: 80.0, damage_reduction: 0.04 } }
+      - { id: hs_e2_evis,     name: "Eviscerate",slot: enhance2, requires_rank: 5, placeholder: true, stats: { multiplicative_damage: 1.10 } }
+      - { id: hs_v_multi,     name: "Multi-Strike",   slot: variant, requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.18 } }
+      - { id: hs_v_spikes,    name: "Tail Spikes",    slot: variant, requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.10 } }
+      - { id: hs_v_swipe,     name: "Demonic Swipe",  slot: variant, requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.20 } }
+
+  # =========================================================================
+  # Core Skills
+  # =========================================================================
+  - id: bombardment
+    name: Bombardment
+    tag: core
+    max_rank: 15
+    min_level: 5
+    source_url: https://maxroll.gg/d4/getting-started/warlock-class-overview
+    per_rank_increment: 0.10
+    cost: { resource: wrath, amount: 30 }
+    base_effect:
+      base_damage_pct: 1.60   # 4 demons x 40%
+      damage_type: physical
+      cast_time: 0.6
+      aoe: true
+      targets: 4
+      lucky_hit_chance: 0.03
+    modifiers:
+      - { id: bomb_e1_focused, name: "Focused Target",     slot: enhance1, requires_rank: 1, placeholder: true, stats: { multiplicative_damage: 1.10 } }
+      - { id: bomb_e1_telekin, name: "Telekinesis",        slot: enhance1, requires_rank: 1, placeholder: true, stats: { multiplicative_damage: 1.06 } }
+      - { id: bomb_e2_extra,   name: "Additional Demon",   slot: enhance2, requires_rank: 5, placeholder: true, stats: { multiplicative_damage: 1.12 } }
+      - { id: bomb_e2_damage,  name: "Damage",             slot: enhance2, requires_rank: 5, placeholder: true, stats: { multiplicative_damage: 1.10 } }
+      - { id: bomb_v_ramping,  name: "Ramping Brutality",  slot: variant,  requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.20 } }
+      - { id: bomb_v_mangled,  name: "Mangled Demons",     slot: variant,  requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.10 } }
+      - { id: bomb_v_endless,  name: "Endless Cascade",    slot: variant,  requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.18 } }
+
   - id: hell_fracture
     name: Hell Fracture
     tag: core
     max_rank: 15
-    min_level: 2
-    placeholder: true
+    min_level: 5
     source_url: https://maxroll.gg/d4/getting-started/warlock-class-overview
     per_rank_increment: 0.10
-    cost:
-      resource: wrath
-      amount: 30
+    cost: { resource: wrath, amount: 30 }
     base_effect:
-      base_damage_pct: 1.80          # snippet: "180% damage"
+      base_damage_pct: 0.80
       damage_type: fire
       cast_time: 0.6
       aoe: true
-      targets: 3                     # snippet: chains up to 2 additional explosions
+      targets: 3
+      lucky_hit_chance: 0.08
+      school: hellfire
     modifiers:
-      - id: fracture_left_brimstone
-        name: Brimstone Echo
-        slot: left
-        requires_rank: 1
-        placeholder: true
-        stats: { additive_damage: 0.06 }
-      - id: fracture_right_chain
-        name: Cascading Fracture
-        slot: right
-        requires_rank: 1
-        placeholder: true
-        stats: { multiplicative_damage: 1.06 }
-      - id: fracture_middle_triple
-        name: Triple Fracture
-        slot: middle
-        requires_rank: 5
-        placeholder: true
-        notes: "Inspired by the Spine of Tathamet snippet (every 3rd cast triple-fractures)."
-        stats: { multiplicative_damage: 1.15, crit_chance: 0.04 }
-      - id: fracture_bonus_volatility
-        name: Volatile Fracture
-        slot: bonus
-        requires_rank: 10
-        placeholder: true
-        stats: { multiplicative_damage: 1.20, crit_damage: 1.80 }
+      - { id: hf_e1_cost,     name: "Cost Reduction",      slot: enhance1, requires_rank: 1, placeholder: true, stats: { multiplicative_damage: 1.06 } }
+      - { id: hf_e1_volat,    name: "Volatility",          slot: enhance1, requires_rank: 1, placeholder: true, stats: { multiplicative_damage: 1.10 } }
+      - { id: hf_e2_extra,    name: "Additional Fracture", slot: enhance2, requires_rank: 5, placeholder: true, stats: { multiplicative_damage: 1.15 } }
+      - { id: hf_e2_rampup,   name: "Ramp Up",             slot: enhance2, requires_rank: 5, placeholder: true, stats: { multiplicative_damage: 1.20 } }
+      - { id: hf_v_lava,      name: "Lava Fissures",       slot: variant,  requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.18 } }
+      - { id: hf_v_eruption,  name: "Eruption",            slot: variant,  requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.15 } }
+      - { id: hf_v_abyss,     name: "Fractured Abyss",     slot: variant,  requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.20 } }
+
+  - id: umbral_chains
+    name: Umbral Chains
+    tag: core
+    max_rank: 15
+    min_level: 5
+    source_url: https://maxroll.gg/d4/getting-started/warlock-class-overview
+    per_rank_increment: 0.10
+    cost: { resource: wrath, amount: 30 }
+    base_effect:
+      base_damage_pct: 0.80
+      damage_type: shadow
+      cast_time: 0.5
+      targets: 2
+      lucky_hit_chance: 0.06
+    modifiers:
+      - { id: uc_e1_long,     name: "Long Range Shadow", slot: enhance1, requires_rank: 1, placeholder: true, stats: { multiplicative_damage: 1.05 } }
+      - { id: uc_e1_capture,  name: "Capture Damage",    slot: enhance1, requires_rank: 1, placeholder: true, stats: { multiplicative_damage: 1.20 } }
+      - { id: uc_e2_refund,   name: "Wrath Refund",      slot: enhance2, requires_rank: 5, placeholder: true, stats: { multiplicative_damage: 1.04 } }
+      - { id: uc_e2_harpoon,  name: "Heavy Harpoon",     slot: enhance2, requires_rank: 5, placeholder: true, stats: { multiplicative_damage: 1.20 } }
+      - { id: uc_v_burst,     name: "Chain Burst",       slot: variant,  requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.15 } }
+      - { id: uc_v_epicenter, name: "Epicenter",         slot: variant,  requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.10 } }
+      - { id: uc_v_whips,     name: "Chain Whips",       slot: variant,  requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.18 } }
+
+  - id: blazing_scream
+    name: Blazing Scream
+    tag: core
+    max_rank: 15
+    min_level: 5
+    source_url: https://maxroll.gg/d4/getting-started/warlock-class-overview
+    per_rank_increment: 0.10
+    cost: { resource: wrath, amount: 35 }
+    base_effect:
+      base_damage_pct: 1.35
+      damage_type: fire
+      cast_time: 0.5
+      lucky_hit_chance: 0.25
+    modifiers:
+      - { id: bs_e1_damage,   name: "Damage",         slot: enhance1, requires_rank: 1, placeholder: true, stats: { multiplicative_damage: 1.15 } }
+      - { id: bs_e1_cost,     name: "Cost Reduction", slot: enhance1, requires_rank: 1, placeholder: true, stats: { multiplicative_damage: 1.06 } }
+      - { id: bs_e2_knock,    name: "Knock Down",     slot: enhance2, requires_rank: 5, placeholder: true, stats: { multiplicative_damage: 1.06 } }
+      - { id: bs_e2_velocity, name: "Impact Velocity",slot: enhance2, requires_rank: 5, placeholder: true, stats: { multiplicative_damage: 1.15 } }
+      - { id: bs_v_splitter,  name: "Skull Splitter", slot: variant,  requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.18 } }
+      - { id: bs_v_orbital,   name: "Orbital",        slot: variant,  requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.25 } }
+      - { id: bs_v_direct,    name: "Direct Control", slot: variant,  requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.20, vulnerable_damage: 1.30 } }
 
   - id: dread_claws
     name: Dread Claws
     tag: core
     max_rank: 15
-    min_level: 2
-    placeholder: true
+    min_level: 5
     source_url: https://maxroll.gg/d4/getting-started/warlock-class-overview
     per_rank_increment: 0.10
-    cost:
-      resource: wrath
-      amount: 25
+    cost: { resource: wrath, amount: 25 }
     base_effect:
-      base_damage_pct: 2.60          # snippet: 4 claws x 65% damage
-      damage_type: shadow            # Abyss school
+      base_damage_pct: 2.60   # 4 claws x 65%
+      damage_type: shadow
       cast_time: 0.5
       aoe: true
       targets: 4
+      lucky_hit_chance: 0.15
     modifiers:
-      - id: claws_left_shadowform
-        name: Shadowform Claws
-        slot: left
-        requires_rank: 1
-        placeholder: true
-        notes: "Snippet: extra claws fire per Shadowform stack."
-        stats: { multiplicative_damage: 1.08 }
-      - id: claws_right_pierce
-        name: Rending Claws
-        slot: right
-        requires_rank: 1
-        placeholder: true
-        stats: { additive_damage: 0.08 }
-      - id: claws_middle_swarm
-        name: Swarm of Claws
-        slot: middle
-        requires_rank: 5
-        placeholder: true
-        stats: { multiplicative_damage: 1.18, crit_chance: 0.04 }
-      - id: claws_bonus_litany
-        name: Litany of Sable
-        slot: bonus
-        requires_rank: 10
-        placeholder: true
-        stats: { multiplicative_damage: 1.25, crit_damage: 1.85 }
+      - { id: dc_e1_cost,    name: "Cost Reduction", slot: enhance1, requires_rank: 1, placeholder: true, stats: { multiplicative_damage: 1.06 } }
+      - { id: dc_e1_damage,  name: "Damage",         slot: enhance1, requires_rank: 1, placeholder: true, stats: { multiplicative_damage: 1.20 } }
+      - { id: dc_e2_vuln,    name: "Vulnerable",     slot: enhance2, requires_rank: 5, placeholder: true, stats: { vulnerable_damage: 1.40 } }
+      - { id: dc_e2_ambush,  name: "Ambush",         slot: enhance2, requires_rank: 5, placeholder: true, stats: { multiplicative_damage: 1.15 } }
+      - { id: dc_v_cascade,  name: "Cascading Dread",   slot: variant, requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.30 } }
+      - { id: dc_v_encircle, name: "Encircling Terror", slot: variant, requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.25 } }
+      - { id: dc_v_ravenous, name: "Ravenous Jaws",     slot: variant, requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.20 } }
 
-  # ---------------- Defensive ----------------
+  # =========================================================================
+  # Defensive Skills
+  # =========================================================================
   - id: wall_of_agony
     name: Wall of Agony
     tag: defensive
     max_rank: 15
-    min_level: 6
-    placeholder: true
+    min_level: 8
+    source_url: https://maxroll.gg/d4/getting-started/warlock-class-overview
+    per_rank_increment: 0.05
+    cost: { resource: wrath, amount: 40 }
+    base_effect:
+      base_damage_pct: 0.30
+      damage_type: physical
+      cast_time: 0.4
+      aoe: true
+      targets: 5
+      self_buff: { damage_reduction: 0.10, armor: 150.0 }
+    modifiers:
+      - { id: wa_e1_cost,    name: "Cost Reduction", slot: enhance1, requires_rank: 1, placeholder: true, stats: { multiplicative_damage: 1.04 } }
+      - { id: wa_e1_knock,   name: "Knock Down",     slot: enhance1, requires_rank: 1, placeholder: true, stats: { multiplicative_damage: 1.05 } }
+      - { id: wa_e2_small,   name: "Small Walls",    slot: enhance2, requires_rank: 5, placeholder: true, stats: { multiplicative_damage: 1.06 } }
+      - { id: wa_e2_damage,  name: "Damage",         slot: enhance2, requires_rank: 5, placeholder: true, stats: { multiplicative_damage: 1.10 } }
+      - { id: wa_v_rush,     name: "Fallen Rush",    slot: variant,  requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.15 } }
+      - { id: wa_v_waller,   name: "Waller",         slot: variant,  requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.10 } }
+      - { id: wa_v_encircle, name: "Encircle",       slot: variant,  requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.10 } }
+
+  - id: tortured_wretch
+    name: Tortured Wretch
+    tag: defensive
+    max_rank: 15
+    min_level: 8
+    source_url: https://maxroll.gg/d4/getting-started/warlock-class-overview
+    per_rank_increment: 0.10
+    cost: { resource: wrath, amount: 30 }
+    base_effect:
+      base_damage_pct: 0.60
+      damage_type: shadow
+      cast_time: 0.4
+      lucky_hit_chance: 0.20
+    modifiers:
+      - { id: tw_e1_cost,     name: "Cost Reduction", slot: enhance1, requires_rank: 1, placeholder: true, stats: { multiplicative_damage: 1.04 } }
+      - { id: tw_e1_unstop,   name: "Unstoppable",    slot: enhance1, requires_rank: 1, placeholder: true, stats: { damage_reduction: 0.06 } }
+      - { id: tw_e2_duration, name: "Duration",       slot: enhance2, requires_rank: 5, placeholder: true, stats: { multiplicative_damage: 1.08 } }
+      - { id: tw_e2_enrage,   name: "Enrage",         slot: enhance2, requires_rank: 5, placeholder: true, stats: { multiplicative_damage: 1.10 } }
+      - { id: tw_v_saws,      name: "Death Saws",     slot: variant,  requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.20 } }
+      - { id: tw_v_punching,  name: "Punching Bag",   slot: variant,  requires_rank: 10, placeholder: true, stats: { life: 200.0, damage_reduction: 0.10 } }
+      - { id: tw_v_dom,       name: "Domination",     slot: variant,  requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.15 } }
+
+  - id: dark_prison
+    name: Dark Prison
+    tag: defensive
+    max_rank: 15
+    min_level: 8
     source_url: https://maxroll.gg/d4/getting-started/warlock-class-overview
     per_rank_increment: 0.05
     base_effect:
       base_damage_pct: 0.0
       damage_type: shadow
-      cooldown: 14.0
-      cast_time: 0.3
-      self_buff:
-        damage_reduction: 0.20
-        armor: 200.0
+      cooldown: 20.0
+      cast_time: 0.4
+      lucky_hit_chance: 0.20
+      self_buff: { damage_reduction: 0.15, armor: 200.0 }
     modifiers:
-      - id: wall_left_reinforce
-        name: Reinforced Wall
-        slot: left
-        requires_rank: 1
-        placeholder: true
-        stats: { armor: 100.0, life: 60.0 }
-      - id: wall_right_thorns
-        name: Spiteful Wall
-        slot: right
-        requires_rank: 1
-        placeholder: true
-        stats: { multiplicative_damage: 1.04 }
+      - { id: dp_e1_cdr,      name: "Cooldown Reduction", slot: enhance1, requires_rank: 1, placeholder: true, stats: { multiplicative_damage: 1.04 } }
+      - { id: dp_e1_weaken,   name: "Weaken",             slot: enhance1, requires_rank: 1, placeholder: true, stats: { multiplicative_damage: 1.10 } }
+      - { id: dp_e2_fortify,  name: "Fortify",            slot: enhance2, requires_rank: 5, placeholder: true, stats: { life: 100.0, damage_reduction: 0.05 } }
+      - { id: dp_e2_missile,  name: "Missile Slow",       slot: enhance2, requires_rank: 5, placeholder: true, stats: { damage_reduction: 0.06 } }
+      - { id: dp_v_tripwire,  name: "Tripwire",           slot: variant,  requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.10 } }
+      - { id: dp_v_calamity,  name: "Calamity",           slot: variant,  requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.20 } }
+      - { id: dp_v_chainaura, name: "Chain Aura",         slot: variant,  requires_rank: 10, placeholder: true, stats: { damage_reduction: 0.15 } }
 
   - id: nether_step
     name: Nether Step
     tag: defensive
     max_rank: 15
     min_level: 8
-    placeholder: true
     source_url: https://maxroll.gg/d4/getting-started/warlock-class-overview
     per_rank_increment: 0.05
     base_effect:
-      base_damage_pct: 0.30
+      base_damage_pct: 0.0
       damage_type: shadow
-      cooldown: 9.0
+      cooldown: 12.0
       cast_time: 0.2
-      aoe: true
-      targets: 3
+      self_buff: { attack_speed: 1.10, damage_reduction: 0.10 }
     modifiers:
-      - id: nether_left_unhindered
-        name: Unhindered Step
-        slot: left
-        requires_rank: 1
-        placeholder: true
-        stats: { damage_reduction: 0.05 }
-      - id: nether_right_shadowstep
-        name: Shadowed Step
-        slot: right
-        requires_rank: 1
-        placeholder: true
-        stats: { multiplicative_damage: 1.05 }
+      - { id: ns_e1_charge,   name: "Extra Charge",      slot: enhance1, requires_rank: 1, placeholder: true, stats: { damage_reduction: 0.04 } }
+      - { id: ns_e1_dr,       name: "Damage Reduction",  slot: enhance1, requires_rank: 1, placeholder: true, stats: { damage_reduction: 0.10 } }
+      - { id: ns_e2_movespeed,name: "Movement Speed",    slot: enhance2, requires_rank: 5, placeholder: true, stats: { attack_speed: 1.05 } }
+      - { id: ns_e2_vacuum,   name: "Vacuum Swap",       slot: enhance2, requires_rank: 5, placeholder: true, stats: { multiplicative_damage: 1.20 } }
+      - { id: ns_v_portals,   name: "Portals",           slot: variant,  requires_rank: 10, placeholder: true, stats: { damage_reduction: 0.05 } }
+      - { id: ns_v_gloomwalk, name: "Gloomwalker",       slot: variant,  requires_rank: 10, placeholder: true, stats: { damage_reduction: 0.10 } }
+      - { id: ns_v_recall,    name: "Recall Shadows",    slot: variant,  requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.10 } }
 
-  # ---------------- Archfiend (summon-empower) ----------------
+  # =========================================================================
+  # Archfiend Skills
+  # =========================================================================
+  - id: rampage
+    name: Rampage
+    tag: archfiend
+    max_rank: 15
+    min_level: 15
+    source_url: https://maxroll.gg/d4/getting-started/warlock-class-overview
+    per_rank_increment: 0.10
+    cost: { resource: dominance, amount: 25 }
+    base_effect:
+      base_damage_pct: 1.28
+      damage_type: physical
+      cast_time: 0.5
+      lucky_hit_chance: 0.30
+    modifiers:
+      - { id: rp_e1_killstreak, name: "Killstreak Damage", slot: enhance1, requires_rank: 1, placeholder: true, stats: { multiplicative_damage: 1.20 } }
+      - { id: rp_e1_wrath,      name: "Wrath",             slot: enhance1, requires_rank: 1, placeholder: true, stats: { multiplicative_damage: 1.04 } }
+      - { id: rp_e2_master,     name: "Demon Master",      slot: enhance2, requires_rank: 5, placeholder: true, stats: { life: 100.0, damage_reduction: 0.05 } }
+      - { id: rp_e2_elite,      name: "Elite Eviscerate",  slot: enhance2, requires_rank: 5, placeholder: true, stats: { multiplicative_damage: 1.15 } }
+      - { id: rp_v_shock,       name: "Shockwave",         slot: variant,  requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.18 } }
+      - { id: rp_v_titan,       name: "Abyssal Titan",     slot: variant,  requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.30 } }
+      - { id: rp_v_smash,       name: "Demonic Smash",     slot: variant,  requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.25 } }
+
+  - id: infernal_breath
+    name: Infernal Breath
+    tag: archfiend
+    max_rank: 15
+    min_level: 15
+    source_url: https://maxroll.gg/d4/getting-started/warlock-class-overview
+    per_rank_increment: 0.10
+    cost: { resource: dominance, amount: 25 }
+    base_effect:
+      base_damage_pct: 0.20
+      damage_type: fire
+      cast_time: 0.4
+      lucky_hit_chance: 0.02
+    modifiers:
+      - { id: ib_e1_volat,    name: "Volatility",          slot: enhance1, requires_rank: 1, placeholder: true, stats: { multiplicative_damage: 1.10 } }
+      - { id: ib_e1_ramping,  name: "Ramping Damage",      slot: enhance1, requires_rank: 1, placeholder: true, stats: { multiplicative_damage: 1.15 } }
+      - { id: ib_e2_heavy,    name: "Heavy Impact Damage", slot: enhance2, requires_rank: 5, placeholder: true, stats: { multiplicative_damage: 1.40 } }
+      - { id: ib_e2_expensive,name: "Expensive Damage",    slot: enhance2, requires_rank: 5, placeholder: true, stats: { multiplicative_damage: 1.30 } }
+      - { id: ib_v_demonic,   name: "Demonic Breath",      slot: variant,  requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.15 } }
+      - { id: ib_v_explosive, name: "Explosive Death",     slot: variant,  requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.20 } }
+      - { id: ib_v_torrent,   name: "Abyssal Torrent",     slot: variant,  requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.25 } }
+
+  - id: tyrants_grasp
+    name: Tyrant's Grasp
+    tag: archfiend
+    max_rank: 15
+    min_level: 15
+    source_url: https://maxroll.gg/d4/getting-started/warlock-class-overview
+    per_rank_increment: 0.10
+    cost: { resource: dominance, amount: 30 }
+    base_effect:
+      base_damage_pct: 1.00
+      damage_type: shadow
+      cast_time: 0.5
+      lucky_hit_chance: 0.15
+    modifiers:
+      - { id: tg_e1_slow,     name: "Slow",              slot: enhance1, requires_rank: 1, placeholder: true, stats: { multiplicative_damage: 1.06 } }
+      - { id: tg_e1_unstop,   name: "Unstoppable Damage",slot: enhance1, requires_rank: 1, placeholder: true, stats: { multiplicative_damage: 1.20 } }
+      - { id: tg_e2_area,     name: "Grasp Area",        slot: enhance2, requires_rank: 5, placeholder: true, stats: { multiplicative_damage: 1.10 } }
+      - { id: tg_e2_knock,    name: "Knock Down",        slot: enhance2, requires_rank: 5, placeholder: true, stats: { multiplicative_damage: 1.06 } }
+      - { id: tg_v_demonic,   name: "Demonic Grasp",     slot: variant,  requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.15 } }
+      - { id: tg_v_inescape,  name: "Inescapable Grasp", slot: variant,  requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.18 } }
+      - { id: tg_v_pit,       name: "Abyssal Pit",       slot: variant,  requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.25 } }
+
   - id: profane_sentinel
     name: Profane Sentinel
     tag: archfiend
     max_rank: 15
     min_level: 15
-    placeholder: true
     source_url: https://maxroll.gg/d4/getting-started/warlock-class-overview
     per_rank_increment: 0.10
-    cost:
-      resource: dominance
-      amount: 30
+    cost: { resource: dominance, amount: 30 }
     base_effect:
-      base_damage_pct: 0.55
+      base_damage_pct: 3.00
       damage_type: lightning
-      cooldown: 0.0
       cast_time: 0.5
-      targets: 2
+      lucky_hit_chance: 0.22
+      applies_vulnerable: true
     modifiers:
-      - id: sentinel_left_legion
-        name: Legion Sentinel
-        slot: left
-        requires_rank: 1
-        placeholder: true
-        stats: { multiplicative_damage: 1.06 }
-      - id: sentinel_right_warden
-        name: Warden Sentinel
-        slot: right
-        requires_rank: 1
-        placeholder: true
-        stats: { armor: 80.0, resist_all: 0.05 }
-      - id: sentinel_middle_archfiend
-        name: Archfiend Bond
-        slot: middle
-        requires_rank: 5
-        placeholder: true
-        stats: { multiplicative_damage: 1.12, attack_speed: 1.05 }
+      - { id: ps_e1_vuln,    name: "Vulnerable",         slot: enhance1, requires_rank: 1, placeholder: true, stats: { vulnerable_damage: 1.30 } }
+      - { id: ps_e1_single,  name: "Single Target Damage", slot: enhance1, requires_rank: 1, placeholder: true, stats: { multiplicative_damage: 1.20 } }
+      - { id: ps_e2_wide,    name: "Wide Beam",          slot: enhance2, requires_rank: 5, placeholder: true, stats: { multiplicative_damage: 1.10 } }
+      - { id: ps_e2_narrow,  name: "Narrow Blast",       slot: enhance2, requires_rank: 5, placeholder: true, stats: { multiplicative_damage: 1.20 } }
+      - { id: ps_v_focused,  name: "Focused Glare",      slot: variant,  requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.25 } }
+      - { id: ps_v_sentry,   name: "Sentry",             slot: variant,  requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.15 } }
+      - { id: ps_v_glare,    name: "Demonic Glare",      slot: variant,  requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.20 } }
 
-  # ---------------- Sigil ----------------
+  # =========================================================================
+  # Sigil Skills
+  # =========================================================================
+  - id: sigil_of_subversion
+    name: Sigil of Subversion
+    tag: sigil
+    max_rank: 15
+    min_level: 12
+    source_url: https://maxroll.gg/d4/getting-started/warlock-class-overview
+    per_rank_increment: 0.08
+    base_effect:
+      base_damage_pct: 0.0
+      damage_type: shadow
+      cooldown: 15.0
+      cast_time: 0.5
+      aoe: true
+      targets: 4
+    modifiers:
+      - { id: sub_e1_blood,    name: "Blood Ritual",     slot: enhance1, requires_rank: 1, placeholder: true, stats: { multiplicative_damage: 1.15 } }
+      - { id: sub_e1_movespd,  name: "Movement Speed",   slot: enhance1, requires_rank: 1, placeholder: true, stats: { attack_speed: 1.05 } }
+      - { id: sub_e2_range,    name: "Cast Range",       slot: enhance2, requires_rank: 5, placeholder: true, stats: { multiplicative_damage: 1.05 } }
+      - { id: sub_e2_slow,     name: "Slow",             slot: enhance2, requires_rank: 5, placeholder: true, stats: { multiplicative_damage: 1.10 } }
+      - { id: sub_v_infiltrat, name: "Infiltration Trails", slot: variant, requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.15 } }
+      - { id: sub_v_seekers,   name: "Seekers",          slot: variant, requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.10 } }
+      - { id: sub_v_lava,      name: "Sigil of Lava",    slot: variant, requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.30 } }
+
+  - id: sigil_of_summons
+    name: Sigil of Summons
+    tag: sigil
+    max_rank: 15
+    min_level: 12
+    source_url: https://maxroll.gg/d4/getting-started/warlock-class-overview
+    per_rank_increment: 0.08
+    base_effect:
+      base_damage_pct: 0.60
+      damage_type: shadow
+      cooldown: 15.0
+      cast_time: 0.5
+      aoe: true
+      targets: 3
+    modifiers:
+      - { id: sum_e1_blood,   name: "Blood Ritual",      slot: enhance1, requires_rank: 1, placeholder: true, stats: { multiplicative_damage: 1.10 } }
+      - { id: sum_e1_damage,  name: "Damage",            slot: enhance1, requires_rank: 1, placeholder: true, stats: { multiplicative_damage: 1.20 } }
+      - { id: sum_e2_cdr,     name: "Cooldown",          slot: enhance2, requires_rank: 5, placeholder: true, stats: { multiplicative_damage: 1.06 } }
+      - { id: sum_e2_stronger,name: "Stronger Summons",  slot: enhance2, requires_rank: 5, placeholder: true, stats: { multiplicative_damage: 1.18 } }
+      - { id: sum_v_frenzy,   name: "Feeding Frenzy",    slot: variant, requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.20, attack_speed: 1.10 } }
+      - { id: sum_v_succubus, name: "Summon Succubus",   slot: variant, requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.25 } }
+      - { id: sum_v_hellwyrm, name: "Summon Hellwyrm",   slot: variant, requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.30 } }
+
   - id: sigil_of_chaos
     name: Sigil of Chaos
     tag: sigil
     max_rank: 15
     min_level: 12
-    placeholder: true
     source_url: https://maxroll.gg/d4/getting-started/warlock-class-overview
     per_rank_increment: 0.08
     base_effect:
-      base_damage_pct: 0.90
+      base_damage_pct: 0.30
       damage_type: fire
-      cooldown: 11.0
+      cooldown: 15.0
       cast_time: 0.5
       aoe: true
-      targets: 4
-      applies_vulnerable: true
+      targets: 5
+      lucky_hit_chance: 0.35
     modifiers:
-      - id: sigil_left_overpower
-        name: Overpowering Sigil
-        slot: left
-        requires_rank: 1
-        placeholder: true
-        stats: { additive_damage: 0.07 }
-      - id: sigil_right_hexbound
-        name: Hexbound Sigil
-        slot: right
-        requires_rank: 1
-        placeholder: true
-        stats: { crit_chance: 0.04 }
-      - id: sigil_middle_chaos
-        name: Pure Chaos
-        slot: middle
-        requires_rank: 5
-        placeholder: true
-        stats: { multiplicative_damage: 1.14, vulnerable_damage: 1.30 }
-      - id: sigil_bonus_eternal
-        name: Eternal Sigil
-        slot: bonus
-        requires_rank: 10
-        placeholder: true
-        stats: { multiplicative_damage: 1.20, attack_speed: 1.08 }
+      - { id: chaos_e1_blood,   name: "Blood Ritual",        slot: enhance1, requires_rank: 1, placeholder: true, stats: { multiplicative_damage: 1.20 } }
+      - { id: chaos_e1_volat,   name: "Volatility Duration", slot: enhance1, requires_rank: 1, placeholder: true, stats: { multiplicative_damage: 1.15 } }
+      - { id: chaos_e2_chain,   name: "Chain Reaction",      slot: enhance2, requires_rank: 5, placeholder: true, stats: { multiplicative_damage: 1.18 } }
+      - { id: chaos_e2_volcasts,name: "Volatility Casts",    slot: enhance2, requires_rank: 5, placeholder: true, stats: { multiplicative_damage: 1.20 } }
+      - { id: chaos_v_rebuke,   name: "Diabolic Rebuke",     slot: variant, requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.25 } }
+      - { id: chaos_v_aura,     name: "Hellfire Aura",       slot: variant, requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.20 } }
+      - { id: chaos_v_smoke,    name: "Sigil of Smoke",      slot: variant, requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.18 } }
 
-  # ---------------- Ultimates ----------------
+  # =========================================================================
+  # Ultimate Skills (Maxroll: "Only one can be chosen". Optimizer enforces.)
+  # =========================================================================
+  - id: fiend_of_abbadon
+    name: Fiend of Abbadon
+    tag: ultimate
+    max_rank: 15
+    min_level: 25
+    source_url: https://maxroll.gg/d4/getting-started/warlock-class-overview
+    per_rank_increment: 0.10
+    base_effect:
+      base_damage_pct: 2.50
+      damage_type: physical
+      cooldown: 60.0
+      cast_time: 0.8
+      aoe: true
+      targets: 6
+      lucky_hit_chance: 0.22
+    modifiers:
+      - { id: foa_e1_lesser,  name: "Lesser Demon Bonus", slot: enhance1, requires_rank: 1, placeholder: true, stats: { multiplicative_damage: 1.20 } }
+      - { id: foa_e1_crowd,   name: "Crowd Damage",       slot: enhance1, requires_rank: 1, placeholder: true, stats: { multiplicative_damage: 1.15 } }
+      - { id: foa_e2_dom,     name: "Dominance",          slot: enhance2, requires_rank: 5, placeholder: true, stats: { multiplicative_damage: 1.10 } }
+      - { id: foa_e2_elite,   name: "Elite Damage",       slot: enhance2, requires_rank: 5, placeholder: true, stats: { multiplicative_damage: 1.20 } }
+      - { id: foa_v_spite,    name: "Spiteful Enrage",    slot: variant,  requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.25 } }
+      - { id: foa_v_colossus, name: "Abyssal Colossus",   slot: variant,  requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.30 } }
+      - { id: foa_v_vanguard, name: "Vanguard of Flames", slot: variant,  requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.30 } }
+
   - id: apocalypse
     name: Apocalypse
     tag: ultimate
     max_rank: 15
     min_level: 25
-    placeholder: true
     source_url: https://maxroll.gg/d4/getting-started/warlock-class-overview
     per_rank_increment: 0.10
     base_effect:
-      base_damage_pct: 3.50
+      base_damage_pct: 6.66
       damage_type: fire
-      cooldown: 60.0
+      cooldown: 66.6
       cast_time: 0.8
       aoe: true
       targets: 8
+      lucky_hit_chance: 0.50
+    modifiers:
+      - { id: apoc_e1_survive, name: "Survivor Damage", slot: enhance1, requires_rank: 1, placeholder: true, stats: { multiplicative_damage: 1.30 } }
+      - { id: apoc_e1_shared,  name: "Shared Damage",   slot: enhance1, requires_rank: 1, placeholder: true, stats: { multiplicative_damage: 1.20 } }
+      - { id: apoc_e2_close,   name: "Close Damage",    slot: enhance2, requires_rank: 5, placeholder: true, stats: { multiplicative_damage: 1.20 } }
+      - { id: apoc_e2_volat,   name: "Volatility",      slot: enhance2, requires_rank: 5, placeholder: true, stats: { multiplicative_damage: 1.20 } }
+      - { id: apoc_v_armag,    name: "Armageddon Ritual",slot: variant, requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.50 } }
+      - { id: apoc_v_doombomb, name: "Doom Bomb",        slot: variant, requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.30 } }
+      - { id: apoc_v_minefield,name: "Minefield",        slot: variant, requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.40 } }
+
+  - id: terror_swarm
+    name: Terror Swarm
+    tag: ultimate
+    max_rank: 15
+    min_level: 25
+    source_url: https://maxroll.gg/d4/getting-started/warlock-class-overview
+    per_rank_increment: 0.10
+    base_effect:
+      base_damage_pct: 5.00
+      damage_type: shadow
+      cooldown: 30.0
+      cast_time: 0.8
+      aoe: true
+      targets: 6
+      lucky_hit_chance: 0.01
       applies_vulnerable: true
     modifiers:
-      - id: apoc_left_meteor
-        name: Meteor Cascade
-        slot: left
-        requires_rank: 1
-        placeholder: true
-        stats: { multiplicative_damage: 1.10 }
-      - id: apoc_right_eternal
-        name: Eternal Suffering
-        slot: right
-        requires_rank: 1
-        placeholder: true
-        stats: { vulnerable_damage: 1.40 }
-      - id: apoc_middle_brimstone
-        name: Brimstone Apocalypse
-        slot: middle
-        requires_rank: 5
-        placeholder: true
-        stats: { multiplicative_damage: 1.20, crit_damage: 1.85 }
+      - { id: ts_e1_vuln,    name: "Vulnerable",      slot: enhance1, requires_rank: 1, placeholder: true, stats: { vulnerable_damage: 1.30 } }
+      - { id: ts_e1_bites,   name: "Extra Bites",     slot: enhance1, requires_rank: 1, placeholder: true, stats: { multiplicative_damage: 1.15 } }
+      - { id: ts_e2_lesser,  name: "Lesser Demons",   slot: enhance2, requires_rank: 5, placeholder: true, stats: { multiplicative_damage: 1.10 } }
+      - { id: ts_e2_pull,    name: "Pull",            slot: enhance2, requires_rank: 5, placeholder: true, stats: { multiplicative_damage: 1.06 } }
+      - { id: ts_v_nightmare,name: "Nightmare",       slot: variant, requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.20 } }
+      - { id: ts_v_devour,   name: "Devouring Swarm", slot: variant, requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.30 } }
+      - { id: ts_v_searing,  name: "Searing Infestation", slot: variant, requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.25 } }
 
   - id: metamorphosis
     name: Metamorphosis
     tag: ultimate
     max_rank: 15
     min_level: 25
-    placeholder: true
     source_url: https://maxroll.gg/d4/getting-started/warlock-class-overview
     per_rank_increment: 0.10
     base_effect:
-      base_damage_pct: 1.20
+      base_damage_pct: 1.37
       damage_type: shadow
-      cooldown: 50.0
+      cooldown: 5.0
       cast_time: 0.4
-      self_buff:
-        damage_reduction: 0.30
-        multiplicative_damage: 1.20
-        attack_speed: 1.20
+      self_buff: { damage_reduction: 0.20, multiplicative_damage: 1.15, attack_speed: 1.15 }
     modifiers:
-      - id: meta_left_demon
-        name: Demonic Form
-        slot: left
-        requires_rank: 1
-        placeholder: true
-        stats: { multiplicative_damage: 1.08 }
-      - id: meta_right_warden
-        name: Wardened Form
-        slot: right
-        requires_rank: 1
-        placeholder: true
-        stats: { damage_reduction: 0.06, life: 100.0 }
-      - id: meta_middle_eternal
-        name: Eternal Demon
-        slot: middle
-        requires_rank: 5
-        placeholder: true
-        stats: { multiplicative_damage: 1.18, crit_chance: 0.05 }
+      - { id: meta_e1_life,   name: "Maximum Life",    slot: enhance1, requires_rank: 1, placeholder: true, stats: { life: 200.0 } }
+      - { id: meta_e1_scale,  name: "Damage Scaling",  slot: enhance1, requires_rank: 1, placeholder: true, stats: { multiplicative_damage: 1.10 } }
+      - { id: meta_e2_stagger,name: "Stagger Bar",     slot: enhance2, requires_rank: 5, placeholder: true, stats: { damage_reduction: 0.08 } }
+      - { id: meta_e2_phase,  name: "Phase 2 Enrage",  slot: enhance2, requires_rank: 5, placeholder: true, stats: { multiplicative_damage: 1.20 } }
+      - { id: meta_v_sin,     name: "Sin Demon",       slot: variant, requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.20 } }
+      - { id: meta_v_destruc, name: "Destruction Demon", slot: variant, requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.30 } }
+      - { id: meta_v_terror,  name: "Terror Demon",    slot: variant, requires_rank: 10, placeholder: true, stats: { multiplicative_damage: 1.25 } }
 
-# Lord of Hatred removes all passive nodes from class skill trees. Passive-
-# style power is now sourced from Legendary Aspects, Uniques, and the new
-# Talisman + Charms system — none of which are modeled here yet. We keep an
-# empty `passives:` list so the loader and optimizer continue to work; populate
-# it only if a future patch reintroduces tree passives.
-#
-# Source: https://news.blizzard.com/en-us/article/24267729/prepare-for-the-reckoning-lord-of-hatred-draws-near
+# Lord of Hatred removes all passive nodes from class skill trees. See
+# CLAUDE.md for where the migrated power lives (Aspects, Uniques, Talisman+
+# Charms). Empty list keeps the loader and optimizer happy.
 passives: []

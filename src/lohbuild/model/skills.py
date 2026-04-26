@@ -37,22 +37,23 @@ class SkillEffect:
     targets: int = 1
     applies_vulnerable: bool = False
     self_buff: StatBlock | None = None
+    lucky_hit_chance: float = 0.0
+    school: str = ""  # "hellfire", "abyss", or "" if unspecified
 
 
 class ModifierSlot(str, Enum):
-    """Which branch slot a modifier occupies on a skill.
+    """Which modifier slot a pick occupies on a skill.
 
-    LoH skill trees give each active skill four modifier slots: Left/Right
-    Path passives (early branches), a Middle Path transformative variant,
-    and a Bonus variant unlocked deeper in the tree. Within a slot the
-    options are mutually exclusive — pick one. Each pick costs 1 skill point
-    and has no rank.
+    Real Maxroll structure (per the Warlock class overview): each active
+    skill has three modifier slots — Enhancement 1 (pick 1 of 2),
+    Enhancement 2 (pick 1 of 2), and Variant (pick 1 of 3, transformative).
+    Picks within a slot are mutually exclusive. Each pick costs 1 skill
+    point and has no rank.
     """
 
-    LEFT = "left"
-    RIGHT = "right"
-    MIDDLE = "middle"
-    BONUS = "bonus"
+    ENHANCE1 = "enhance1"
+    ENHANCE2 = "enhance2"
+    VARIANT = "variant"
 
 
 @dataclass
@@ -96,6 +97,8 @@ class Skill:
             targets=self.base_effect.targets,
             applies_vulnerable=self.base_effect.applies_vulnerable,
             self_buff=self.base_effect.self_buff,
+            lucky_hit_chance=self.base_effect.lucky_hit_chance,
+            school=self.base_effect.school,
         )
         return scaled
 
