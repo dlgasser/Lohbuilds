@@ -19,6 +19,7 @@ src/lohbuild/
   cli.py                 entry point: lohbuild warlock --level 70
   scoring.py             DPS / EHP / composite score
   optimizer.py           greedy 1-70 leveling allocator
+  presets.py             community build presets + comparison report
   model/                 dataclasses (stats, skills, gear, build, enemy)
   data/                  YAML data + loader
     classes/warlock.yaml
@@ -130,13 +131,28 @@ Variant tables on that page.
 - **Sigil** (3): Sigil of Subversion, Sigil of Summons, Sigil of Chaos
 - **Ultimate** (4): Fiend of Abbadon, Apocalypse, Terror Swarm, Metamorphosis
 
+## Community presets (`presets.py`)
+
+Known build guides are encoded in `presets.py` as `Preset` objects. CLI flag
+`--compare PRESET_ID` scores the preset side-by-side with the optimizer result.
+
+Current presets:
+- **`shadow_claw`** — Dread Claws Abyss leveling (Mobalytics community guide,
+  not yet verified against a downloaded planner page). Modifier stat values are
+  placeholder. Source note is printed in the report.
+
+To add a new preset: add a `Preset` entry to `PRESETS` in `presets.py`. The
+`build_from_preset()` function handles leveling base stats and starter loadout
+so only the skill allocation needs to be specified.
+
 ## Local commands
 
 Editable install (preferred — see README for venv setup):
 
 ```bash
 lohbuild warlock --level 70
-lohbuild warlock --level 70 --season-journey 13   # full 83-point pool
+lohbuild warlock --level 70 --season-journey 13         # full 83-point pool
+lohbuild warlock --level 70 --season-journey 13 --compare shadow_claw
 ```
 
 Without install:

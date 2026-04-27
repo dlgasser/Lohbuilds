@@ -5,6 +5,7 @@ import sys
 
 from .data import load_class, load_itemization
 from .optimizer import optimize_leveling, report
+from .presets import PRESETS, build_from_preset, report_preset
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -25,6 +26,14 @@ def build_parser() -> argparse.ArgumentParser:
             "leveling pool (cap 70). Total is hard-capped at 83. Default 0."
         ),
     )
+    leveling.add_argument(
+        "--compare",
+        metavar="PRESET",
+        help=(
+            "Compare optimizer output against a community preset. "
+            f"Available: {', '.join(PRESETS)}."
+        ),
+    )
     return parser
 
 
@@ -42,6 +51,26 @@ def main(argv: list[str] | None = None) -> int:
             season_journey=args.season_journey,
         )
         print(report(result, cls, season_journey=args.season_journey))
+
+        if args.compare:
+            preset = PRESETS.get(args.compare)
+            if preset is None:
+                print(
+                    f"\nUnknown preset '{args.compare}'. "
+                    f"Available: {', '.join(PRESETS)}.",
+                    file=sys.stderr,
+                )
+                return 1
+            print()
+            print("=" * 60)
+            print()
+            preset_build = build_from_preset(
+                preset, cls, items,
+                level=args.level,
+                season_journey=args.season_journey,
+            )
+            print(report_preset(preset, preset_build, cls))
+
         return 0
 
     parser.print_help()
